@@ -14,14 +14,21 @@ public class ChatServer {
 
 	// Note //"HELO text\nIP:[ip address]\nPort:[port number]\nStudentID:[your
 	// student ID]";
+	private static final int UNDEFINED_JOIN_ID = -1;
+	private static final String JOIN_CHATROOM_IDENTIFIER = "JOIN_CHATROOM: ";
+	private static final String CHAT_IDENTIFIER = "CHAT: ";
+	private static final String LEAVE_CHATROOM_IDENTIFIER = "LEAVE_CHATROOM: ";
+	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
+	private static final String CLIENT_NAME_IDENTIFIER = "CLIENT_NAME: ";
 
 	private static final int SERVER_PORT = 12345;
 	// Use String.format() method for HELO_RESPONSE
 	private static final String HELO_RESPONSE = "HELO text\nIP:[%s]\nPort:[%s]\nStudentID:[%s]";
-	private static final int STUDENT_ID = 12345678; // TODO @Breandán change
+	private static final int STUDENT_ID = 12345678; // TODO @Breandï¿½n change
 	private static final SocketAddress SERVER_ADDRESS = null; // TODO initialise
 	private static Boolean terminateServer;
 	private static ServerSocket serverSocket;
+	private static int serverPort;
 	private static String fullHelloResponse = String.format(HELO_RESPONSE, SERVER_ADDRESS, SERVER_PORT, STUDENT_ID);
 
 	private static AtomicInteger numActiveConnections; // threadsafe
@@ -126,7 +133,7 @@ public class ChatServer {
 	}
 
 	private static void handleClientRequest(RequestType parseRequestType) {
-		// TODO @Breandán
+		// TODO @Breandï¿½n
 		// Based on the type, we should either create a new thread or not
 		// Depending on the type of request, may need different threads
 	}
@@ -142,6 +149,10 @@ public class ChatServer {
 		terminateServer = Boolean.FALSE;
 		serverSocket.bind(SERVER_ADDRESS, SERVER_PORT);
 		// TODO any other initialisation		
+	}
+
+	public static int getServerPortNumber() {
+		return serverPort;
 	}
 
 }
