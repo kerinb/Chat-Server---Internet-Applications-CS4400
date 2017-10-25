@@ -109,6 +109,24 @@ public class ChatServer {
 		}
 	}
 
+    static synchronized void updateClientListing(RequestType requestType, ClientNode clientNode){
+	    if(clientNode!=null){
+	        if(requestType.equals(RequestType.JoinChatroom) && !getAllActiveChatRooms().values().contains(clientNode)){
+                addClientToServer(clientNode);
+            }else if( requestType.equals(RequestType.Disconnect) && getAllActiveChatRooms().values().contains(clientNode)){
+	            removeClientFromServer(clientNode, getRequestedChatRoomIfIsThere(clientNode.getChatRoomId()));
+            }
+        }
+    }
+
+    private static void addClientToServer(ClientNode clientNode){
+
+    }
+
+    private static void removeClientFromServer(ClientNode clientNode, ChatRoom chatRoom){
+        
+    }
+
 	private static void removeClientRecord(Socket clientSocket) {
 		if (clientSocket != null && listOfActiveClients.contains(clientSocket)) {
 			listOfActiveClients.remove(clientSocket);
