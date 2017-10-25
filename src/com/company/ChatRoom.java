@@ -45,7 +45,7 @@ public class ChatRoom {
                 broadcastStreamToAllClients.print(messageToBroadcast);
             }
         }catch (IOException IOE){
-            String ErrorMessage = String.format("ERROR: " + IOE + " \n OCCURRED: " + getTodaysDate());
+            String ErrorMessage = String.format("ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate());
             System.out.println(ErrorMessage);
         }
     }
@@ -54,14 +54,8 @@ public class ChatRoom {
         if(!listOfClientsInChatRoom.contains(clientNode)){
             listOfClientsInChatRoom.add(clientNode);
             String messageToBroadcast = String.format("Client %s has left the chat room at %s", clientNode.getName(),
-                    getTodaysDate());
+                    ErrorHandler.getTodaysDate());
             broadcastMessageToChatRoom(messageToBroadcast);
         }
-    }
-
-    public String getTodaysDate(){
-        Date today = Calendar.getInstance().getTime();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-hh.mm.ss");
-        return formatter.format(today);
     }
 }

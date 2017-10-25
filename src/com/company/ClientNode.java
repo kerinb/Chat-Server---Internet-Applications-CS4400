@@ -1,6 +1,7 @@
 package com.company;
 
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientNode {
     private String clientName;
@@ -16,8 +17,13 @@ public class ClientNode {
         this.connection = connection;
     }
 
-    public String getName(){ return this.clientName; }
-    public String getChatRoomId() { return chatRoomId; }
-    public Integer getMemberId() { return memberId; }
-    public Socket getConnection() { return connection; }
+    public String getName(){return this.clientName;}
+    public String getChatRoomId() {return chatRoomId;}
+    public Integer getMemberId() {return memberId;}
+    public Socket getConnection() {return connection;}
+
+    public void setName(String clientName){this.clientName = clientName;}
+    public void setChatRoomId(String chatRoomId) {this.chatRoomId = chatRoomId;}
+    public void setMemberId(int memberId) {this. memberId = memberId;}
+    public void setConnection(Socket connection) {this.connection = connection;}
 }

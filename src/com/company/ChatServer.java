@@ -7,7 +7,10 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatServer {
@@ -26,12 +29,14 @@ public class ChatServer {
 	private static final String HELO_RESPONSE = "HELO text\nIP:[%s]\nPort:[%s]\nStudentID:[%s]";
 	private static final int STUDENT_ID = 12345678; // TODO @Breand�n change
 	private static final SocketAddress SERVER_ADDRESS = null; // TODO initialise
-	private static Boolean terminateServer;
+	private static AtomicBoolean terminateServer;
 	private static ServerSocket serverSocket;
 	private static int serverPort;
-	private static String fullHelloResponse = String.format(HELO_RESPONSE, SERVER_ADDRESS, SERVER_PORT, STUDENT_ID);
+    public static AtomicInteger clientId;
+    private static String fullHelloResponse = String.format(HELO_RESPONSE, SERVER_ADDRESS, SERVER_PORT, STUDENT_ID);
 
 	private static AtomicInteger numActiveConnections; // threadsafe
+    private static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> ListOfActiveChatRooms;
 	private static ConcurrentSkipListSet<Socket> listOfActiveClients = new ConcurrentSkipListSet<Socket>(); // threadsafe
 
 	public static void main(String[] args) {
@@ -66,7 +71,7 @@ public class ChatServer {
 		// TODO revise this implementation
 		listOfActiveClients.clear();
 		if (requestedFromClient) {
-			terminateServer = Boolean.TRUE;
+			terminateServer = new AtomicBoolean(true);
 		} else {
 			serverSocket.close();
 		}
@@ -146,7 +151,7 @@ public class ChatServer {
 	}
 
 	private static void initialiseServer() throws IOException {
-		terminateServer = Boolean.FALSE;
+		terminateServer = new AtomicBoolean(false);
 		serverSocket.bind(SERVER_ADDRESS, SERVER_PORT);
 		// TODO any other initialisation		
 	}
@@ -155,4 +160,19 @@ public class ChatServer {
 		return serverPort;
 	}
 
+	public static void killChatService(AtomicBoolean atomicBoolean) {
+		terminateServer = atomicBoolean;
+	}
+
+	public static ChatRoom getRequestedChatRoomIfIsThere(String ChatRoomToJoin){
+	    for(Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : ListOfActiveChatRooms.entrySet()){
+	        if(entry.getKey().getChatRoomId() == ChatRoomToJoin)
+	            return entry.getKey();
+        }
+        return null;
+    }
+
+    public static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> getAllActiveChatRooms() {
+        return ListOfActiveChatRooms;
+    }
 }
