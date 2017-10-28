@@ -1,16 +1,16 @@
 package com.company;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientThread extends Thread {
     private ClientNode clientNode;
+
     private int serverPortNumber;
+
     private RequestType requestType;
+
     private List<String> messagesRecievedFromClient;
 
     private static final String SPLIT_MESSAGE_PATTERN = ": ";
@@ -38,15 +38,49 @@ public class ClientThread extends Thread {
                 this.clientNode.getChatRoomId(), 0, this.serverPortNumber, this.clientNode.getChatRoomId(),
                 this.clientNode.getMemberId());
         responseToClientNode(responseToSentToClient);
+        assert chatRoomRequested != null;
         chatRoomRequested.broadcastMessageToChatRoom(
                 String.format("A new client called %s has joined the chatroom!", clientNode.getName()));
+    }
+
+    private void leaveCurrentChatRoom(){
+        String chatRoomToLeave = this.clientNode.getChatRoomId();
+        ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(chatRoomToLeave);
+        if(chatRoom!=null){
+            try {
+                chatRoom.removeClientFromChatRoom(this.clientNode);
+            }catch (Exception e){
+                String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
+                System.out.println(ErrorMessage);
+            }
+        }
+        String responseForClient = String.format(ResponceFromServer.LEAVE_CHATROOM.getValue(),
+                this.clientNode.getChatRoomId(), this.clientNode.getMemberId());
+        responseToClientNode(responseForClient);
+    }
+
+    private void hello(){
+        String response = String.format(ResponceFromServer.HELO.getValue(), this.messagesRecievedFromClient.
+                get(3).split(MESSAGE_IDENTIFIER)[1], Resources.SERVER_IP, this.serverPortNumber, Resources.STUDENT_ID);
+        responseToClientNode(response);
+    }
+
+    private void chat(){
+       String messageToSend = this.messagesRecievedFromClient.get(3).split(SPLIT_MESSAGE_PATTERN, 0)[1];
+       ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(this.clientNode.getChatRoomId());
+
+       if (chatRoom!=null){
+           String responseToSendToClients = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomId(),
+                   this.clientNode.getMemberId(), this.clientNode.getName(), messageToSend);
+           chatRoom.broadcastMessageToChatRoom(responseToSendToClients);
+       }
     }
 
     private void responseToClientNode(String response){
         try {
             this.clientNode.getConnection().getOutputStream().write(response.getBytes());
         }catch (IOException IOE){
-            String ErrorMessage = String.format("ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate());
+            String ErrorMessage = "ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
             System.out.println(ErrorMessage);
         }
     }
@@ -68,5 +102,49 @@ public class ClientThread extends Thread {
 
     private void killClientService(){
         ChatServer.killChatService(new AtomicBoolean((true)));
+    }
+
+    private void disconnect(){
+        String leaveChatRoomMessage = this.clientNode.getChatRoomId();
+        ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(leaveChatRoomMessage);
+        try {
+            assert chatRoom != null;
+            chatRoom.removeClientFromChatRoom(clientNode);
+        }catch (Exception e){
+            String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
+            System.out.println(ErrorMessage);
+        }
+        ChatServer.updateClientListing(RequestType.Disconnect, clientNode);
+    }
+
+    @Override
+    public void run(){
+        try {
+            switch (this.requestType){
+                case JoinChatroom:
+                    joinChatRoom();
+                    break;
+                case HelloText:
+                    hello();
+                    break;
+                case Chat:
+                    chat();
+                    break;
+                case LeaveChatroom:
+                    leaveCurrentChatRoom();
+                    break;
+                case Disconnect:
+                    disconnect();
+                    break;
+                case KillService:
+                    killClientService();
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e){
+            String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
+            System.out.println(ErrorMessage);
+        }
     }
 }

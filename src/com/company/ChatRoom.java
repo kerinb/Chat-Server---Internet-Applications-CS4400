@@ -1,15 +1,8 @@
 package com.company;
 
-import com.sun.org.apache.bcel.internal.Constants;
-import com.sun.org.apache.bcel.internal.classfile.Constant;
-import org.omg.CORBA.ServerRequest;
-
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.text.SimpleDateFormat;
 
 public class ChatRoom {
     private String chatRoomId;
@@ -45,7 +38,7 @@ public class ChatRoom {
                 broadcastStreamToAllClients.print(messageToBroadcast);
             }
         }catch (IOException IOE){
-            String ErrorMessage = String.format("ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate());
+            String ErrorMessage = "ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
             System.out.println(ErrorMessage);
         }
     }

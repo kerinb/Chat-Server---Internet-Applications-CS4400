@@ -1,7 +1,6 @@
 package com.company;
 
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientNode {
     private String clientName;
