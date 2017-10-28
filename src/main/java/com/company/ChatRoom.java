@@ -46,8 +46,8 @@ public class ChatRoom {
     public void removeClientFromChatRoom(ClientNode clientNode) throws Exception {
         if(!listOfClientsInChatRoom.contains(clientNode)){
             listOfClientsInChatRoom.add(clientNode);
-            String messageToBroadcast = String.format("Client %s has left the chat room at %s", clientNode.getName(),
-                    ErrorHandler.getTodaysDate());
+            String messageToBroadcast = "Client %s has left the chat room at %s" + clientNode.getName() +
+                    ErrorHandler.getTodaysDate();
             broadcastMessageToChatRoom(messageToBroadcast);
         }
     }

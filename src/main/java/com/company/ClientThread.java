@@ -66,14 +66,14 @@ public class ClientThread extends Thread {
     }
 
     private void chat(){
-       String messageToSend = this.messagesRecievedFromClient.get(3).split(SPLIT_MESSAGE_PATTERN, 0)[1];
-       ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(this.clientNode.getChatRoomId());
+        String messageToSend = this.messagesRecievedFromClient.get(3).split(SPLIT_MESSAGE_PATTERN, 0)[1];
+        ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(this.clientNode.getChatRoomId());
 
-       if (chatRoom!=null){
-           String responseToSendToClients = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomId(),
-                   this.clientNode.getMemberId(), this.clientNode.getName(), messageToSend);
-           chatRoom.broadcastMessageToChatRoom(responseToSendToClients);
-       }
+        if (chatRoom!=null){
+            String responseToSendToClients = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomId(),
+                    this.clientNode.getMemberId(), this.clientNode.getName(), messageToSend);
+            chatRoom.broadcastMessageToChatRoom(responseToSendToClients);
+        }
     }
 
     private void responseToClientNode(String response){
@@ -108,7 +108,7 @@ public class ClientThread extends Thread {
         String leaveChatRoomMessage = this.clientNode.getChatRoomId();
         ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(leaveChatRoomMessage);
         try {
-            assert chatRoom != null;
+            if (chatRoom == null) throw new AssertionError();
             chatRoom.removeClientFromChatRoom(clientNode);
         }catch (Exception e){
             String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();

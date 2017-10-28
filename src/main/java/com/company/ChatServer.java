@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -17,18 +16,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ChatServer {
 
-	// Note //"HELO text\nIP:[ip address]\nPort:[port number]\nStudentID:[your
-	// student ID]";
-	private static final int UNDEFINED_JOIN_ID = -1;
+    // Note //"HELO text\nIP:[ip address]\nPort:[port number]\nStudentID:[your
+    // student ID]";
+    private static final int UNDEFINED_JOIN_ID = -1;
     private static int serverPort;
 
     private static final String JOIN_CHATROOM_IDENTIFIER = "JOIN_CHATROOM: ";
-	private static final String CHAT_IDENTIFIER = "CHAT: ";
-	private static final String LEAVE_CHATROOM_IDENTIFIER = "LEAVE_CHATROOM: ";
-	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
-	private static final String CLIENT_NAME_IDENTIFIER = "CLIENT_NAME: ";
+    private static final String CHAT_IDENTIFIER = "CHAT: ";
+    private static final String LEAVE_CHATROOM_IDENTIFIER = "LEAVE_CHATROOM: ";
+    private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
+    private static final String CLIENT_NAME_IDENTIFIER = "CLIENT_NAME: ";
 
-	private static AtomicBoolean terminateServer;
+    private static AtomicBoolean terminateServer;
 
     public static AtomicInteger clientId;
 
@@ -36,33 +35,33 @@ public class ChatServer {
 
     private static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> ListOfActiveChatRooms;
 
-	public static void main(String[] args) {
-		try {
-			initialiseServer(args[0]);
-			try {
-				while (!terminateServer.equals(Boolean.TRUE)) {
-					handleClientConnection();
-				}
-			} catch (Exception e) {
+    public static void main(String[] args) {
+        try {
+            initialiseServer(args[0]);
+            try {
+                while (!(terminateServer == new AtomicBoolean(Boolean.TRUE))) {
+                    handleClientConnection();
+                }
+            } catch (Exception e) {
                 String ErrorMessage = "ERROR: occurred with client connection " + e.getMessage() + " \n OCCURRED: "
                         + ErrorHandler.getTodaysDate();
                 System.out.println(ErrorMessage);
-			}
-		} catch (Exception e){
-		    String ErrorMessage = "ERROR: encountered with server initialisation: " + e.getMessage() + " \n OCCURRED: "
+            }
+        } catch (Exception e){
+            String ErrorMessage = "ERROR: encountered with server initialisation: " + e.getMessage() + " \n OCCURRED: "
                     + ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
-		}
-		finally {
-			try {
-				killServer();
-			} catch (IOException e) {
+            System.out.println(ErrorMessage);
+        }
+        finally {
+            try {
+                killServer();
+            } catch (IOException e) {
                 String ErrorMessage = "ERROR: encountered with killing server : " + e.getMessage() + " \n OCCURRED: "
                         + ErrorHandler.getTodaysDate();
                 System.out.println(ErrorMessage);
-			}
-		}
-	}
+            }
+        }
+    }
 
     private static void initialiseServer(String portNumber) throws IOException {
         serverPort = Integer.parseInt(portNumber);
@@ -146,11 +145,11 @@ public class ChatServer {
     }
 
     public static void updateClientListing(RequestType requestType, ClientNode clientNode) {
-	    if (clientNode!= null){
-	        if (requestType.equals(RequestType.JoinChatroom) && !getAllActiveChatRooms().values().contains(clientNode)){
-	            addClientToServer(clientNode);
+        if (clientNode!= null){
+            if (requestType.equals(RequestType.JoinChatroom) && !getAllActiveChatRooms().values().contains(clientNode)){
+                addClientToServer(clientNode);
             }else if(requestType.equals(RequestType.Disconnect) && getAllActiveChatRooms().values().contains(clientNode)){
-	            removeClientFromServer(clientNode, getRequestedChatRoomIfIsThere(clientNode.getChatRoomId()));
+                removeClientFromServer(clientNode, getRequestedChatRoomIfIsThere(clientNode.getChatRoomId()));
             }
         }
     }
@@ -201,6 +200,7 @@ public class ChatServer {
     public static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> getAllActiveChatRooms() {
         return ListOfActiveChatRooms;
     }
+
 
     public static ChatRoom getRequestedChatRoomIfIsThere(String ChatRoomToJoin){
         for(Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : ListOfActiveChatRooms.entrySet()){
