@@ -11,4 +11,9 @@ class ErrorHandler {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh.mm.ss");
 		return formatter.format(today);
 	}
+
+	static void printError(String errorMessage, String errorNote) {
+		String ErrorMessage = "ERROR: " + errorNote + errorMessage + "\n" + "Occurred at: " + getTodaysDate();
+		System.out.println(ErrorMessage);
+	}
 }

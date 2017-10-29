@@ -37,16 +37,15 @@ public class ChatRoom {
 				PrintStream broadcastStreamToAllClients = new PrintStream(clientNode.getConnection().getOutputStream());
 				broadcastStreamToAllClients.print(messageToBroadcast);
 			}
-		} catch (IOException IOE) {
-			String ErrorMessage = "ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
+		} catch (IOException e) {
+			ErrorHandler.printError(e.getMessage(), " occurred when trying to broadcast message to chatroom: ");
 		}
 	}
 
 	public void removeClientFromChatRoom(ClientNode clientNode) throws Exception {
 		if (!listOfClientsInChatRoom.contains(clientNode)) {
 			listOfClientsInChatRoom.add(clientNode);
-			String messageToBroadcast = "Client %s has left the chat room at %s" + clientNode.getName()
+			String messageToBroadcast = "Client %s has left the chat room at " + clientNode.getName()
 					+ ErrorHandler.getTodaysDate();
 			broadcastMessageToChatRoom(messageToBroadcast);
 		}

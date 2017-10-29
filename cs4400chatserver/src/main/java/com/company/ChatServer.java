@@ -42,21 +42,16 @@ public class ChatServer {
 			try {
 				handleClientConnection();
 			} catch (Exception e) {
-				String ErrorMessage = "ERROR: occurred with client connection " + e.getMessage() + " \nOCCURRED: "
-						+ ErrorHandler.getTodaysDate();
-				System.out.println(ErrorMessage);
+				ErrorHandler.printError(e.getMessage(), " occurred with client connection: ");
 			}
 		} catch (Exception e) {
-			String ErrorMessage = "ERROR: encountered with server initialisation: " + e.getMessage() + " \nOCCURRED: "
-					+ ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
+			ErrorHandler.printError(e.getMessage(), " encountered with server initialisation: ");
+
 		} finally {
 			try {
 				killServer();
 			} catch (IOException e) {
-				String ErrorMessage = "ERROR: encountered with killing server : " + e.getMessage() + " \nOCCURRED: "
-						+ ErrorHandler.getTodaysDate();
-				System.out.println(ErrorMessage);
+				ErrorHandler.printError(e.getMessage(), " encountered with killing server: ");
 			}
 		}
 	}
@@ -65,13 +60,13 @@ public class ChatServer {
 		serverPort = Integer.parseInt(portNumber);
 		serverSocket = new ServerSocket(serverPort);
 		initialiseServerValues();
-		String message = "Serveris listening on port number: %s " + portNumber;
+		String message = "Server is listening on port number: %s " + portNumber;
 		System.out.println(message);
 	}
 
 	private static void initialiseServerValues() {
 		ListOfActiveChatRooms = new ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>>();
-		terminateServer = new AtomicBoolean(Boolean.FALSE);
+		setTerminateServer(new AtomicBoolean(Boolean.FALSE));
 		clientId = new AtomicInteger(0);
 	}
 
@@ -86,9 +81,7 @@ public class ChatServer {
 			getAllActiveChatRooms().clear();
 			serverSocket.close();
 		} catch (Exception e) {
-			String errorMessage = "Error occurred when shutting down server: " + e.getMessage() + " at: "
-					+ ErrorHandler.getTodaysDate();
-			System.out.println(errorMessage);
+			ErrorHandler.printError(e.getMessage(), " occurred when shutting down server: ");
 		}
 	}
 
@@ -159,6 +152,7 @@ public class ChatServer {
 		try {
 			return RequestType.valueOf(request);
 		} catch (Exception e) {
+			ErrorHandler.printError(e.getMessage(), " occurred when getting client request: ");
 			return null;
 		}
 	}
@@ -188,9 +182,7 @@ public class ChatServer {
 				try {
 					clientNode.getConnection().close();
 				} catch (IOException e) {
-					String ErrorMessage = "ERROR: occurred with removing client connection " + e.getMessage()
-							+ " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-					System.out.println(ErrorMessage);
+					ErrorHandler.printError(e.getMessage(), " occurred with removing client connection: ");
 				}
 				return;
 			}
@@ -222,6 +214,14 @@ public class ChatServer {
 	}
 
 	public static void killChatService(AtomicBoolean atomicBoolean) {
-		terminateServer = atomicBoolean;
+		setTerminateServer(atomicBoolean);
+	}
+
+	public static AtomicBoolean getTerminateServer() {
+		return terminateServer;
+	}
+
+	public static void setTerminateServer(AtomicBoolean terminateServer) {
+		ChatServer.terminateServer = terminateServer;
 	}
 }

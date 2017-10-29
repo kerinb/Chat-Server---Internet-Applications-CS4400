@@ -50,8 +50,8 @@ public class ClientThread extends Thread {
 			try {
 				chatRoom.removeClientFromChatRoom(this.clientNode);
 			} catch (Exception e) {
-				String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-				System.out.println(ErrorMessage);
+				ErrorHandler.printError(e.getMessage(), " occurred when trying to leave current chatroom: ");
+
 			}
 		}
 		String responseForClient = String.format(ResponceFromServer.LEAVE_CHATROOM.getValue(),
@@ -80,9 +80,8 @@ public class ClientThread extends Thread {
 	private void responseToClientNode(String response) {
 		try {
 			this.clientNode.getConnection().getOutputStream().write(response.getBytes());
-		} catch (IOException IOE) {
-			String ErrorMessage = "ERROR: " + IOE + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
+		} catch (IOException e) {
+			ErrorHandler.printError(e.getMessage(), " occurred when trying to respond to client: ");
 		}
 	}
 
@@ -113,8 +112,7 @@ public class ClientThread extends Thread {
 				throw new AssertionError();
 			chatRoom.removeClientFromChatRoom(clientNode);
 		} catch (Exception e) {
-			String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
+			ErrorHandler.printError(e.getMessage(), " occurred when trying to disconnect: ");
 		}
 		ChatServer.updateClientListing(RequestType.Disconnect, clientNode);
 	}
@@ -145,8 +143,7 @@ public class ClientThread extends Thread {
 				break;
 			}
 		} catch (Exception e) {
-			String ErrorMessage = "ERROR: " + e + " \n OCCURRED: " + ErrorHandler.getTodaysDate();
-			System.out.println(ErrorMessage);
+			ErrorHandler.printError(e.getMessage(), " occurred when trying to run client thread: ");
 		}
 	}
 }
