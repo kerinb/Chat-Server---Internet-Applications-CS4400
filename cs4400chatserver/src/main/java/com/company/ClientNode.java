@@ -25,4 +25,12 @@ public class ClientNode {
     public void setChatRoomId(String chatRoomId) {this.chatRoomId = chatRoomId;}
     public void setMemberId(int memberId) {this. memberId = memberId;}
     public void setConnection(Socket connection) {this.connection = connection;}
+    
+    @Override
+    public String toString(){
+    	String message = "Clients Name: " + this.getName() + "\n" + 
+    			"Clients member ID: " + this.getMemberId() + "\n" + 
+    			"Client joined chatroom: " + this.getChatRoomId();
+    	return message;
+    }
 }

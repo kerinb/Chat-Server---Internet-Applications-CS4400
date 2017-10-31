@@ -148,7 +148,7 @@ public class ChatServer {
 	}
 
 	public static RequestType request(Socket clientSocket) throws IOException {
-		String request = parseRequestType(clientSocket);
+		String request = parseRequest(clientSocket);
 		try {
 			return RequestType.valueOf(request);
 		} catch (Exception e) {
@@ -157,7 +157,7 @@ public class ChatServer {
 		}
 	}
 
-	private static String parseRequestType(Socket clientSocket) throws IOException {
+	private static String parseRequest(Socket clientSocket) throws IOException {
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		String clientSentence = inFromClient.readLine();
 		String[] request = clientSentence.split(":", 1);

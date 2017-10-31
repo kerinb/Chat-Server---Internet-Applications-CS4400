@@ -14,7 +14,7 @@ public class ClientThread extends Thread {
 	private List<String> messagesRecievedFromClient;
 
 	private static final String SPLIT_MESSAGE_PATTERN = ": ";
-	private static final String MESSAGE_IDENTIFIER = "HELO ";
+	private static final String START_MESSAGE_IDENTIFIER = "HELO ";
 
 	// Constructor
 	public ClientThread(ClientNode clientNode, RequestType requestType, List<String> messagesFromClient) {
@@ -61,7 +61,7 @@ public class ClientThread extends Thread {
 
 	private void hello() {
 		String response = String.format(ResponceFromServer.HELO.getValue(),
-				this.messagesRecievedFromClient.get(3).split(MESSAGE_IDENTIFIER)[1], Resources.SERVER_IP,
+				this.messagesRecievedFromClient.get(3).split(START_MESSAGE_IDENTIFIER)[1], Resources.SERVER_IP,
 				this.serverPortNumber, Resources.STUDENT_ID);
 		responseToClientNode(response);
 	}
