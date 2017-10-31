@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 class ErrorHandler {
+	
 
 	static String getTodaysDate() {
 		Date today = Calendar.getInstance().getTime();
@@ -13,7 +14,7 @@ class ErrorHandler {
 	}
 
 	static void printError(String errorMessage, String errorNote) {
-		String ErrorMessage = "ERROR: " + errorNote + errorMessage + "\n" + "Occurred at: " + getTodaysDate();
-		System.out.println(ErrorMessage);
+		String messageToPrint = "ERROR: " + errorNote + errorMessage + "\n" + "Occurred at: " + getTodaysDate();
+		System.out.println(messageToPrint);
 	}
 }

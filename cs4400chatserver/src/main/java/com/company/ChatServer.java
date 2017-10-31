@@ -33,9 +33,11 @@ public class ChatServer {
 
 	private static ServerSocket serverSocket;
 
+	private static ConcurrentSkipListSet <ClientNode> listOfActiveClients;
 	private static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> listOfActiveChatRooms;
 
 	// NOTE: args[0] is port number
+	// 
 	public static void main(String[] args) {
 		try {
 			initialiseServer(args[0]);
@@ -56,6 +58,7 @@ public class ChatServer {
 		}
 	}
 
+	//
 	public static void initialiseServer(String portNumber) throws IOException {
 		serverPort = Integer.parseInt(portNumber);
 		serverSocket = new ServerSocket(serverPort);
@@ -64,12 +67,15 @@ public class ChatServer {
 		System.out.println(message);
 	}
 
+	//
 	public static void initialiseServerValues() {
 		listOfActiveChatRooms = new ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>>();
+		listOfActiveClients = new ConcurrentSkipListSet<ClientNode>();
 		setTerminateServer(new AtomicBoolean(Boolean.FALSE));
 		clientId = new AtomicInteger(0);
 	}
 
+	//
 	static void killServer() throws IOException {
 		try {
 			System.out.println("Killing Server......");
@@ -132,10 +138,10 @@ public class ChatServer {
 		ClientThread newConnectedClientThread = new ClientThread(clientNode, requestType, message);
 
 		newConnectedClientThread.run();
-		updateClientListing(requestType, clientNode);
 	}
-
-	public static void updateClientListing(RequestType requestType, ClientNode clientNode) {
+	
+	//
+	public static void addClientChangeToServer(RequestType requestType, ClientNode clientNode) {
 		if (clientNode != null) {
 			if (requestType.equals(RequestType.JoinChatroom)
 					&& !getAllActiveChatRooms().values().contains(clientNode)) {
@@ -147,6 +153,19 @@ public class ChatServer {
 		}
 	}
 
+	//
+	public static void addClientToServer(ClientNode clientNode){
+		System.out.println(clientNode.getChatRoomId());
+		System.out.println(clientNode.getName());
+		System.out.println(clientNode.getMemberId());
+		System.out.println(clientNode.getChatRoomId());
+
+		if(!getAllClientsConnected().contains(clientNode)){
+			listOfActiveClients.add(clientNode);
+		}
+	}
+	
+	//
 	public static RequestType request(Socket clientSocket) throws IOException {
 		String request = parseRequest(clientSocket);
 		try {
@@ -157,6 +176,7 @@ public class ChatServer {
 		}
 	}
 
+	//
 	private static String parseRequest(Socket clientSocket) throws IOException {
 		BufferedReader inFromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		String clientSentence = inFromClient.readLine();
@@ -164,17 +184,7 @@ public class ChatServer {
 		return request[0];
 	}
 
-	private static void addClientToServer(ClientNode clientNode) {
-		for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : getAllActiveChatRooms().entrySet()) {
-			if (Objects.equals(entry.getKey().getChatRoomId(), clientNode.getChatRoomId())) {
-				if (!entry.getValue().contains(clientNode)) {
-					entry.getValue().add(clientNode);
-					return;
-				}
-			}
-		}
-	}
-
+	//
 	private static void removeClientFromServer(ClientNode clientNode, ChatRoom chatRoom) {
 		for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : getAllActiveChatRooms().entrySet()) {
 			if (entry.getKey() == chatRoom) {
@@ -189,10 +199,12 @@ public class ChatServer {
 		}
 	}
 
+	//
 	public static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> getAllActiveChatRooms() {
 		return listOfActiveChatRooms;
 	}
 
+	//
 	public static ChatRoom getRequestedChatRoomIfIsThere(String ChatRoomToJoin) {
 		for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : listOfActiveChatRooms.entrySet()) {
 			if (Objects.equals(entry.getKey().getChatRoomId(), ChatRoomToJoin))
@@ -201,17 +213,16 @@ public class ChatServer {
 		return null;
 	}
 
+	//
 	public static int getServerPortNumber() {
 		return serverPort;
 	}
 
-	public static synchronized ConcurrentSkipListSet<ClientNode> getAllConnectedClients() {
-		ConcurrentSkipListSet<ClientNode> allClients = new ConcurrentSkipListSet<ClientNode>();
-		for (ConcurrentSkipListSet<ClientNode> clients : listOfActiveChatRooms.values()) {
-			allClients.addAll(clients);
-		}
-		return allClients;
+	//
+	public static synchronized ConcurrentSkipListSet<ClientNode> getAllClientsConnected() {
+		return listOfActiveClients;
 	}
+	
 
 	public static void killChatService(AtomicBoolean atomicBoolean) {
 		setTerminateServer(atomicBoolean);

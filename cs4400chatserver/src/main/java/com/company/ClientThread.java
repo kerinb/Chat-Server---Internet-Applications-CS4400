@@ -114,7 +114,7 @@ public class ClientThread extends Thread {
 		} catch (Exception e) {
 			ErrorHandler.printError(e.getMessage(), " occurred when trying to disconnect: ");
 		}
-		ChatServer.updateClientListing(RequestType.Disconnect, clientNode);
+		ChatServer.addClientChangeToServer(RequestType.Disconnect, clientNode);
 	}
 
 	@Override
