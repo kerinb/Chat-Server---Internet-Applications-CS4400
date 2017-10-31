@@ -56,7 +56,7 @@ public class ChatServer {
 		}
 	}
 
-	private static void initialiseServer(String portNumber) throws IOException {
+	public static void initialiseServer(String portNumber) throws IOException {
 		serverPort = Integer.parseInt(portNumber);
 		serverSocket = new ServerSocket(serverPort);
 		initialiseServerValues();
@@ -64,13 +64,13 @@ public class ChatServer {
 		System.out.println(message);
 	}
 
-	private static void initialiseServerValues() {
+	public static void initialiseServerValues() {
 		ListOfActiveChatRooms = new ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>>();
 		setTerminateServer(new AtomicBoolean(Boolean.FALSE));
 		clientId = new AtomicInteger(0);
 	}
 
-	private static void killServer() throws IOException {
+	static void killServer() throws IOException {
 		try {
 			System.out.println("Killing Server......");
 			for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : getAllActiveChatRooms().entrySet()) {

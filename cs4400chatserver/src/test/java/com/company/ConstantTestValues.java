@@ -1,5 +1,7 @@
 package com.company;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 
 import org.mockito.Mockito;
@@ -24,6 +26,8 @@ public class ConstantTestValues {
 	public Socket leaveClientMockSocket;
 	public Socket disconnectClientMockSocket;
 	public Socket killClientMockSocket;
+	
+	public static final String PORT_NUMBER_TEST = "1234";
 
 	//Constructor
 	public ConstantTestValues(){
@@ -33,10 +37,19 @@ public class ConstantTestValues {
 		this.disconnectClientMockSocket = mockClientSocket(String.format(DISCONNECT, CLIENT));
 		this.helloClientMockSocket = mockClientSocket(HELLO);
 	}
+	
+	public static String getPortNumberTest(){return ConstantTestValues.PORT_NUMBER_TEST;}
 
 	private Socket mockClientSocket(String mockRequest) {
-		// TODO Auto-generated method stub
-		return null;
+		Socket clientSocketMock = Mockito.mock(Socket.class);
+		try{
+			Mockito.when(clientSocketMock.getInputStream()).thenReturn(new ByteArrayInputStream(mockRequest.getBytes()));
+			Mockito.when(clientSocketMock.getOutputStream()).thenReturn(new ByteArrayOutputStream());
+			return clientSocketMock;
+		}catch(Exception e){
+			ErrorHandler.printError(e.getMessage(), String.format("Occurred when mocking %s", mockRequest));
+			return null;
+		}
 	}
 }
 
