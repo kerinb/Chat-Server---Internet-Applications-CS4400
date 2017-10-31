@@ -27,7 +27,7 @@ public class ConstantTestValues {
 	public Socket disconnectClientMockSocket;
 	public Socket killClientMockSocket;
 	
-	public static final String PORT_NUMBER_TEST = "1234";
+	public static final String PORT_NUMBER_TEST = "1236";
 
 	//Constructor
 	public ConstantTestValues(){
