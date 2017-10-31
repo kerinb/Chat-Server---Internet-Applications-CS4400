@@ -33,7 +33,7 @@ public class ChatServer {
 
 	private static ServerSocket serverSocket;
 
-	private static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> ListOfActiveChatRooms;
+	private static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> listOfActiveChatRooms;
 
 	// NOTE: args[0] is port number
 	public static void main(String[] args) {
@@ -65,7 +65,7 @@ public class ChatServer {
 	}
 
 	public static void initialiseServerValues() {
-		ListOfActiveChatRooms = new ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>>();
+		listOfActiveChatRooms = new ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>>();
 		setTerminateServer(new AtomicBoolean(Boolean.FALSE));
 		clientId = new AtomicInteger(0);
 	}
@@ -190,11 +190,11 @@ public class ChatServer {
 	}
 
 	public static ConcurrentSkipListMap<ChatRoom, ConcurrentSkipListSet<ClientNode>> getAllActiveChatRooms() {
-		return ListOfActiveChatRooms;
+		return listOfActiveChatRooms;
 	}
 
 	public static ChatRoom getRequestedChatRoomIfIsThere(String ChatRoomToJoin) {
-		for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : ListOfActiveChatRooms.entrySet()) {
+		for (Map.Entry<ChatRoom, ConcurrentSkipListSet<ClientNode>> entry : listOfActiveChatRooms.entrySet()) {
 			if (Objects.equals(entry.getKey().getChatRoomId(), ChatRoomToJoin))
 				return entry.getKey();
 		}
@@ -207,7 +207,7 @@ public class ChatServer {
 
 	public static synchronized ConcurrentSkipListSet<ClientNode> getAllConnectedClients() {
 		ConcurrentSkipListSet<ClientNode> allClients = new ConcurrentSkipListSet<ClientNode>();
-		for (ConcurrentSkipListSet<ClientNode> clients : ListOfActiveChatRooms.values()) {
+		for (ConcurrentSkipListSet<ClientNode> clients : listOfActiveChatRooms.values()) {
 			allClients.addAll(clients);
 		}
 		return allClients;
