@@ -34,7 +34,7 @@ public class ChatServerTest {
 		ClientNode clientNode = new ClientNode( ConstantTestValues.CLIENT, "1", 1, constantTestValues.joinClientMockSocket);
 		
 		ChatServer.addClientToServer(clientNode);
-		System.out.println( ChatServer.getAllActiveChatRooms().size());
+		System.out.println( ChatServer.getAllClientsConnected().size());
 		assertTrue("There is only 1 node in the server currently", ChatServer.getAllClientsConnected().size() == 1);
 		
 		ChatServer.addClientToServer(clientNode);

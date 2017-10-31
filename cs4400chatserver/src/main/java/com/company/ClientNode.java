@@ -2,7 +2,7 @@ package com.company;
 
 import java.net.Socket;
 
-public class ClientNode {
+public class ClientNode implements Comparable<ClientNode>{
     private String clientName;
     private String chatRoomId;
     private Integer memberId;
@@ -33,4 +33,14 @@ public class ClientNode {
     			"Client joined chatroom: " + this.getChatRoomId();
     	return message;
     }
+
+	@Override
+	public int compareTo(ClientNode o) {
+		if(this.getMemberId()< o.getMemberId()){
+			return -1;
+		}else if(this.getMemberId()> o.getMemberId()){
+			return 1;
+		}
+	return 0;
+	}
 }
