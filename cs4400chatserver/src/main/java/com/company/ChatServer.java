@@ -155,11 +155,6 @@ public class ChatServer {
 
 	//
 	public static void addClientToServer(ClientNode clientNode){
-		System.out.println(clientNode.getChatRoomId());
-		System.out.println(clientNode.getName());
-		System.out.println(clientNode.getMemberId());
-		System.out.println(clientNode.getChatRoomId());
-
 		if(!getAllClientsConnected().contains(clientNode)){
 			listOfActiveClients.add(clientNode);
 		}

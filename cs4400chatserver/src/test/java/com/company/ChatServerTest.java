@@ -34,9 +34,14 @@ public class ChatServerTest {
 		ClientNode clientNode = new ClientNode( ConstantTestValues.CLIENT, "1", 1, constantTestValues.joinClientMockSocket);
 		
 		ChatServer.addClientToServer(clientNode);
-		System.out.println( ChatServer.getAllClientsConnected().size());
 		assertTrue("There is only 1 node in the server currently", ChatServer.getAllClientsConnected().size() == 1);
-		
+	}
+	
+	@Test 
+	public void noDuplicatedAddedClients(){
+		ClientNode clientNode = new ClientNode( ConstantTestValues.CLIENT, "1", 1, constantTestValues.joinClientMockSocket);
+
+		ChatServer.addClientToServer(clientNode);
 		ChatServer.addClientToServer(clientNode);
 		assertTrue("Duplicate node is not added to server", ChatServer.getAllClientsConnected().size() == 1);
 	}
