@@ -2,52 +2,68 @@ package com.company;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-public class ChatRoom {
+public class ChatRoom implements Comparable<ChatRoom>{
+	private List<ConnectedClient>  listOfAllConnectedClients;
 	private String chatRoomId;
-	private ConcurrentSkipListSet<ClientNode> listOfClientsInChatRoom;
-
+	private Integer chatRoomRef;
+	
 	// ChatRoom constructor
-	public ChatRoom(String chatRoomId) {
-		this.chatRoomId = chatRoomId;
-		this.listOfClientsInChatRoom = new ConcurrentSkipListSet<ClientNode>();
+	public ChatRoom(String RoomId, int chatRoomRef){
+		chatRoomId = RoomId;
+		this.chatRoomRef = chatRoomRef;
+		this.listOfAllConnectedClients = new ArrayList<ConnectedClient>();
 	}
+	
+	public List<ConnectedClient> getListOfAllConnectedClients(){return listOfAllConnectedClients;}
+	public Integer getChatRoomRef(){return chatRoomRef;}
+	public String getChatRoomId(){return chatRoomId;}
 
-	public ConcurrentSkipListSet<ClientNode> getListOfClientsInChatRoom() {
-		return listOfClientsInChatRoom;
-	}
-
-	public String getChatRoomId() {
-		return chatRoomId;
-	}
-
-	public void addNewClientToChatRoom(ClientNode clientNode) {
-		if (!listOfClientsInChatRoom.contains(clientNode)) {
-			listOfClientsInChatRoom.add(clientNode);
-			String messageToBroadcast = String.format(ResponceFromServer.JOIN_CHATROOM.getValue(), this.chatRoomId,
-					Resources.SERVER_IP, ChatServer.getServerPortNumber(), this.chatRoomId, clientNode.getMemberId());
-			broadcastMessageToChatRoom(messageToBroadcast);
-		}
-	}
-
-	public void broadcastMessageToChatRoom(String messageToBroadcast) {
-		try {
-			for (ClientNode clientNode : listOfClientsInChatRoom) {
-				PrintStream broadcastStreamToAllClients = new PrintStream(clientNode.getConnection().getOutputStream());
-				broadcastStreamToAllClients.print(messageToBroadcast);
+	public void addClientRecord(Socket socket, RequestTypeNode requestTypeNode, PrintWriter printWriter){
+		for(ConnectedClient connectedClient : listOfAllConnectedClients){
+			if(connectedClient.getSocket().equals(socket)){
+				return;
 			}
-		} catch (IOException e) {
-			ErrorHandler.printError(e.getMessage(), " occurred when trying to broadcast message to chatroom: ");
 		}
+		listOfAllConnectedClients.add(new ConnectedClient(socket, printWriter));
+		System.out.println("Client " +requestTypeNode.getName() +  " was added to chatroom!");
+	}
+	
+	public void removeClientRecord(Socket socket, RequestTypeNode requestTypeNode){
+		for(ConnectedClient connectedClient : listOfAllConnectedClients){
+			if(connectedClient.getSocket().equals(socket)){
+				this.listOfAllConnectedClients.remove(connectedClient);
+				System.out.println("Client " +requestTypeNode.getName() +  " was removed from chatroom!");
+				return;
+			}
+		}
+		System.out.println("Client " +requestTypeNode.getName() +  " was not part of chatroom!");
 	}
 
-	public void removeClientFromChatRoom(ClientNode clientNode) throws Exception {
-		if (!listOfClientsInChatRoom.contains(clientNode)) {
-			listOfClientsInChatRoom.add(clientNode);
-			String messageToBroadcast = "Client %s has left the chat room at " + clientNode.getName()
-					+ ErrorHandler.getTodaysDate();
-			broadcastMessageToChatRoom(messageToBroadcast);
+	@Override
+	public int compareTo(ChatRoom o) {
+		if(this.getChatRoomRef() < o.getChatRoomRef()){
+			return -1;
+		}else if(this.getChatRoomRef() > o.getChatRoomRef()){
+			return 1;
 		}
+		return 0;
 	}
+	
+	public synchronized void broadcastMessageToEntireChatRoom(String messageToBroadCast){
+		for(ConnectedClient connectedClient : listOfAllConnectedClients){
+			if(connectedClient.getSocket() != null){
+				connectedClient.getPrintWriter().print(messageToBroadCast);
+				connectedClient.getPrintWriter().flush();
+			}
+		}
+		System.out.println("Broadcasted messgae to chatroom");
+	}
+	
+	
 }

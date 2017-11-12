@@ -1,149 +1,241 @@
 package com.company;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 public class ClientThread extends Thread {
-	private ClientNode clientNode;
+	private static final String PATTERN_SPLITTER = ": ";
+	private static final String HELO = "HELO ";
+	private static final int UNKNOWN_JOIN_ID = -1;
+	private static final String JOIN_CHATROOM = "JOIN_CHATROOM: ";
+	private static final String CHATROOM_IDENTIFIER = "CHAT: ";
+	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
+	private static final String CLIENT_NAME = "CLIENT_NAME: ";
+	private static final String STUDENT_ID = "14310166"; 
 
-	private int serverPortNumber;
 
-	private RequestType requestType;
-
-	private List<String> messagesRecievedFromClient;
-
-	private static final String SPLIT_MESSAGE_PATTERN = ": ";
-	private static final String START_MESSAGE_IDENTIFIER = "HELO ";
-
-	// Constructor
-	public ClientThread(ClientNode clientNode, RequestType requestType, List<String> messagesFromClient) {
-		super();
-		this.clientNode = clientNode;
-		this.messagesRecievedFromClient = messagesFromClient;
-		this.requestType = requestType;
-	}
-
-	private void joinChatRoom() {
-		String chatRoomRequestedToJoin = this.clientNode.getChatRoomId();
-		ChatRoom chatRoomRequested = ChatServer.getRequestedChatRoomIfIsThere(chatRoomRequestedToJoin);
-
-		if (this.clientNode.getChatRoomId() == null) {
-			this.clientNode.setMemberId(ChatServer.clientId.getAndIncrement());
-		}
-
-		setChatRoomData(chatRoomRequested);
-
-		String responseToSentToClient = String.format(ResponceFromServer.JOIN_CHATROOM.getValue(),
-				this.clientNode.getChatRoomId(), 0, this.serverPortNumber, this.clientNode.getChatRoomId(),
-				this.clientNode.getMemberId());
-		responseToClientNode(responseToSentToClient);
-		assert chatRoomRequested != null;
-		chatRoomRequested.broadcastMessageToChatRoom(
-				String.format("A new client called %s has joined the chatroom!", clientNode.getName()));
-	}
-
-	private void leaveCurrentChatRoom() {
-		String chatRoomToLeave = this.clientNode.getChatRoomId();
-		ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(chatRoomToLeave);
-		if (chatRoom != null) {
-			try {
-				chatRoom.removeClientFromChatRoom(this.clientNode);
-			} catch (Exception e) {
-				ErrorHandler.printError(e.getMessage(), " occurred when trying to leave current chatroom: ");
-
-			}
-		}
-		String responseForClient = String.format(ResponceFromServer.LEAVE_CHATROOM.getValue(),
-				this.clientNode.getChatRoomId(), this.clientNode.getMemberId());
-		responseToClientNode(responseForClient);
-	}
-
-	private void hello() {
-		String response = String.format(ResponceFromServer.HELO.getValue(),
-				this.messagesRecievedFromClient.get(3).split(START_MESSAGE_IDENTIFIER)[1], Resources.SERVER_IP,
-				this.serverPortNumber, Resources.STUDENT_ID);
-		responseToClientNode(response);
-	}
-
-	private void chat() {
-		String messageToSend = this.messagesRecievedFromClient.get(3).split(SPLIT_MESSAGE_PATTERN, 0)[1];
-		ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(this.clientNode.getChatRoomId());
-
-		if (chatRoom != null) {
-			String responseToSendToClients = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomId(),
-					this.clientNode.getMemberId(), this.clientNode.getName(), messageToSend);
-			chatRoom.broadcastMessageToChatRoom(responseToSendToClients);
+	PrintWriter  printWriter = null;
+	BufferedReader bufferedReader = null;
+	private Socket socket;
+	List<ChatRoom> chatRooms = null;
+	private int joinId;
+	private String clientName = null;
+	
+	public ClientThread(Socket socket){
+		try{
+			this.socket = socket;
+			this.printWriter = new PrintWriter(socket.getOutputStream());
+			this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		}catch(IOException e){
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when creating new client thread");
 		}
 	}
-
-	private void responseToClientNode(String response) {
-		try {
-			this.clientNode.getConnection().getOutputStream().write(response.getBytes());
-		} catch (IOException e) {
-			ErrorHandler.printError(e.getMessage(), " occurred when trying to respond to client: ");
-		}
-	}
-
-	private void setChatRoomData(ChatRoom chatRoomRequested) {
-		if (chatRoomRequested != null) {
-			chatRoomRequested.addNewClientToChatRoom(clientNode);
-			ChatServer.getAllActiveChatRooms().get(chatRoomRequested).add(clientNode);
-		} else {
-			chatRoomRequested = createNewChatRoom();
-			chatRoomRequested.addNewClientToChatRoom(clientNode);
-			ChatServer.getAllActiveChatRooms().put(chatRoomRequested, chatRoomRequested.getListOfClientsInChatRoom());
-		}
-	}
-
-	private ChatRoom createNewChatRoom() {
-		return new ChatRoom(clientNode.getChatRoomId());
-	}
-
-	private void killClientService() {
-		ChatServer.killChatService(new AtomicBoolean((true)));
-	}
-
-	private void disconnect() {
-		String leaveChatRoomMessage = this.clientNode.getChatRoomId();
-		ChatRoom chatRoom = ChatServer.getRequestedChatRoomIfIsThere(leaveChatRoomMessage);
-		try {
-			if (chatRoom == null)
-				throw new AssertionError();
-			chatRoom.removeClientFromChatRoom(clientNode);
-		} catch (Exception e) {
-			ErrorHandler.printError(e.getMessage(), " occurred when trying to disconnect: ");
-		}
-		ChatServer.addClientChangeToServer(RequestType.Disconnect, clientNode);
-	}
-
+	
 	@Override
-	public void run() {
-		try {
-			switch (this.requestType) {
-			case JoinChatroom:
-				joinChatRoom();
-				break;
-			case HelloText:
-				hello();
-				break;
-			case Chat:
-				chat();
-				break;
-			case LeaveChatroom:
-				leaveCurrentChatRoom();
-				break;
-			case Disconnect:
-				disconnect();
-				break;
-			case KillService:
-				killClientService();
-				break;
-			default:
-				break;
+	public void run(){
+		while(true){
+			try{
+				List<String> dataReceivedFromClient = getEntireMessageSentByClient(this.socket);
+				RequestType requestType = actionRequestedByClient(dataReceivedFromClient);
+				if(requestType == null){
+					ErrorAndPrintHandler.printString("Could not parse request: Null value");
+					return;
+				}
+				RequestTypeNode requestTypeNode = ExtractInfoFromClient(this.socket, requestType, dataReceivedFromClient);
+				if(requestTypeNode == null){
+					ErrorAndPrintHandler.printString("Could not parse request type: Null value");
+					return;
+				}
+				handleRequestByClient(requestTypeNode, requestType, dataReceivedFromClient);
+			}catch(Exception e){
+				ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when running Client Thread");
 			}
-		} catch (Exception e) {
-			ErrorHandler.printError(e.getMessage(), " occurred when trying to run client thread: ");
 		}
+	}
+
+	private void handleRequestByClient(RequestTypeNode requestTypeNode, RequestType requestType,
+			List<String> dataReceivedFromClient) {
+		if(requestTypeNode == null){
+			ErrorAndPrintHandler.printString("requestTypeNode was null: invalid value");
+			return;
+		}
+		switch(requestType){
+		case JoinChatroom:
+			joinChatRoom(requestTypeNode);
+			break;
+		case Chat:
+			chat(requestTypeNode);
+			break;	
+		case LeaveChatroom:
+			leaveChatRoom(requestTypeNode);
+			break;	
+		case KillService:
+			killService(requestTypeNode);
+			break;
+		case Disconnect:
+			disconnect(requestTypeNode);
+			break;	
+		default:
+			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", requestType));
+		}
+	}
+
+	private void disconnect(RequestTypeNode requestTypeNode) {
+		String chatRoom = requestTypeNode.getChatRoomId();
+		ErrorAndPrintHandler.printString(String.format("%s is disconnecting from server", requestTypeNode.getName()));
+		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByIdIfExist(requestTypeNode.getChatRoomId());
+		chatRoomOnRecord.removeClientRecord(socket, requestTypeNode);
+	}
+
+	private void killService(RequestTypeNode requestTypeNode) {
+		ErrorAndPrintHandler.printString(String.format("Client: %s requested to kill server", requestTypeNode.getName()));
+		ChatServer.setRunningValue(false);
+		try{
+			wait(10000);
+		}catch(InterruptedException e){
+			ErrorAndPrintHandler.printError(e.getMessage(), "Issue with killing service");
+		}
+		if(!ChatServer.getServerSocket().isClosed()){
+			handleKillServiceError(requestTypeNode, ErrorMessages.KillService);
+		}
+	}
+
+	private void handleKillServiceError(RequestTypeNode requestTypeNode, ErrorMessages killservice) {
+		String errorMessageToPrint = ResponceFromServer.ERROR.getValue() + killservice.getValue();
+		try{
+			this.socket.getOutputStream().write(errorMessageToPrint.getBytes());;
+		}catch(IOException e){
+			ErrorAndPrintHandler.printError(e.getMessage(), "Couldnt communicate failed killserver error to client");
+		}
+	}
+
+	private void leaveChatRoom(RequestTypeNode requestTypeNode) {
+		String chatRoomRequestedToLeave =  requestTypeNode.getChatRoomId();
+		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving chatroom: %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
+		try{
+			String chatRoomToLeave = chatRoomRequestedToLeave;
+			ChatRoom leaveChatRoom = ChatServer.getChatRoomByIdIfExist(chatRoomToLeave);
+			if(leaveChatRoom != null){
+				if(clientInChatRoom(leaveChatRoom)){
+					String messageToClient = String.format("Client: %s has left chatRoom: %s", requestTypeNode.getName(), requestTypeNode.getChatRoomId());
+					writeToClient(messageToClient);
+				}
+				String clientExitFromChatroom = String.format("%s has left chatroom\n", requestTypeNode.getName());
+				String message = String.format(ResponceFromServer.CHAT.getValue(), leaveChatRoom.getChatRoomRef(), requestTypeNode.getName(), clientExitFromChatroom);
+				leaveChatRoom.broadcastMessageToEntireChatRoom(message);
+				
+				if(clientInChatRoom(leaveChatRoom)){
+					leaveChatRoom.removeClientRecord(socket, requestTypeNode);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	private boolean clientInChatRoom(ChatRoom chatRoom) {
+		for(ConnectedClient connectedClient : chatRoom.getListOfAllConnectedClients()){
+			if(connectedClient.getSocket().equals(this.socket)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void chat(RequestTypeNode requestTypeNode) {
+		
+	}
+
+	private void joinChatRoom(RequestTypeNode requestTypeNode) {
+		String ChatRoomToJoin = requestTypeNode.getChatRoomId();
+		ErrorAndPrintHandler.printString(String.format("Joining ChatRoom: %s", requestTypeNode.getChatRoomId()));
+		try{
+			String chatRoomToJoin = ChatRoomToJoin;
+			ChatRoom requestedChatRoomToJoin = ChatServer.getChatRoomByIdIfExist(chatRoomToJoin);
+			if(this.joinId == UNKNOWN_JOIN_ID){
+				this.joinId = ChatServer.nextClientId.getAndIncrement();
+			}
+			if(requestedChatRoomToJoin == null){
+				requestedChatRoomToJoin = createChatRoom(chatRoomToJoin);
+				requestedChatRoomToJoin.addClientRecord(this.socket, requestTypeNode, this.printWriter);
+				ChatServer.getListOfAllActiveChatRooms().add(requestedChatRoomToJoin);
+			}else{
+				try{
+					requestedChatRoomToJoin.addClientRecord(this.socket, requestTypeNode, this.printWriter);
+				}catch(Exception e){
+					e.printStackTrace();
+					ErrorAndPrintHandler.printError(e.getMessage(), "Alread a member of chat room - resend join request");
+					writeJoinRequestAndBroadcast(requestedChatRoomToJoin, requestTypeNode);
+					return;
+				}
+			}
+			writeJoinRequestAndBroadcast(requestedChatRoomToJoin, requestTypeNode);
+		}catch(Exception e){
+			ErrorAndPrintHandler.printError(e.getMessage(), "ErrorJoing Chatroom");
+			e.printStackTrace();
+		}
+	}
+
+	private void writeJoinRequestAndBroadcast(ChatRoom requestedChatRoomToJoin, RequestTypeNode requestTypeNode) {
+		String messageToClient = String.format(ResponceFromServer.JOIN.getValue(), requestedChatRoomToJoin.getChatRoomId(), ChatServer.getServerIp(),
+				ChatServer.getServerPort(), requestedChatRoomToJoin.getChatRoomRef(),  this.joinId);
+		writeToClient(messageToClient);
+		
+		String messageToBroadCast = String.format("Client: %s jhas joined the chatroom %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId());
+		String message = String.format(ResponceFromServer.CHAT.getValue(), requestedChatRoomToJoin.getChatRoomRef(), requestTypeNode.getName(), messageToBroadCast);
+		requestedChatRoomToJoin.broadcastMessageToEntireChatRoom(message);
+	}
+
+	private void writeToClient(String messageToBroadCast) {
+		try{
+			this.printWriter.print(messageToBroadCast);
+			this.printWriter.flush();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	private ChatRoom createChatRoom(String chatRoomToJoin) {
+		ChatRoom chatRoom = new ChatRoom(chatRoomToJoin, ChatServer.nextChatRoomId.getAndIncrement());
+		ErrorAndPrintHandler.printString("Created a new chatroom" + chatRoom.getChatRoomId());
+		return chatRoom;
+	}
+
+	private RequestTypeNode ExtractInfoFromClient(Socket socket, RequestType requestType,
+			List<String> dataReceivedFromClient) {
+		switch(requestType){
+		case JoinChatroom:
+			return new RequestTypeNode(dataReceivedFromClient.get(3).split(CLIENT_NAME, 0)[1], dataReceivedFromClient.get(0).split(JOIN_CHATROOM, 0)[1],
+					dataReceivedFromClient, requestType);
+			break;
+		case Chat:
+			return new RequestTypeNode(clientName, joinId, clientName);
+			break;	
+		case LeaveChatroom:
+			return new RequestTypeNode(clientName, joinId, clientName);
+			break;	
+		case KillService:
+			return new RequestTypeNode(clientName, joinId, clientName);
+			break;
+		case Disconnect:
+			return new RequestTypeNode(clientName, joinId, clientName);
+			break;	
+		default:
+			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", requestType));
+			return null;
+	}
+
+	private RequestType actionRequestedByClient(List<String> dataReceivedFromClient) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private List<String> getEntireMessageSentByClient(Socket socket2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -17,7 +17,7 @@ public class ChatServerTest {
 		try {
 			ChatServer.initialiseServer(ConstantTestValues.getPortNumberTest());
 		} catch (IOException e) {
-			ErrorHandler.printError(e.getMessage(), "Occurred in setting up test server instance");
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred in setting up test server instance");
 		}
 	}
 	
@@ -26,7 +26,7 @@ public class ChatServerTest {
 		try {
 			ChatServer.killServer();
 		} catch (IOException e) {
-			ErrorHandler.printError(e.getMessage(), "Occurred in killing the test server instance");
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred in killing the test server instance");
 		}
 	}
 	

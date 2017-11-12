@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-class ErrorHandler {
+class ErrorAndPrintHandler {
 	
 
 	static String getTodaysDate() {
@@ -16,5 +16,9 @@ class ErrorHandler {
 	static void printError(String errorMessage, String errorNote) {
 		String messageToPrint = "ERROR: " + errorNote + errorMessage + "\n" + "Occurred at: " + getTodaysDate();
 		System.out.println(messageToPrint);
+	}
+	
+	static void printString(String message){
+		System.out.println(message);
 	}
 }

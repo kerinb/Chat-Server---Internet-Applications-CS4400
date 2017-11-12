@@ -47,7 +47,7 @@ public class ConstantTestValues {
 			Mockito.when(clientSocketMock.getOutputStream()).thenReturn(new ByteArrayOutputStream());
 			return clientSocketMock;
 		}catch(Exception e){
-			ErrorHandler.printError(e.getMessage(), String.format("Occurred when mocking %s", mockRequest));
+			ErrorAndPrintHandler.printError(e.getMessage(), String.format("Occurred when mocking %s", mockRequest));
 			return null;
 		}
 	}
