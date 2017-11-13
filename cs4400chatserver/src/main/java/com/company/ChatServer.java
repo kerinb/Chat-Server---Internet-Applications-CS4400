@@ -17,7 +17,7 @@ public class ChatServer {
 	private static volatile boolean isServerRunning;
 	
 	private static List<ChatRoom> listOfAllActiveChatRooms;
-	private static List<Socket> listOfAllActiveClients;
+	private static List<ConnectedClient> listOfAllActiveClients;
 	
 	static int serverPort;
 	
@@ -27,8 +27,8 @@ public class ChatServer {
 	public static String getServerIp(){return serverIP;}
 	public static void setRunningValue(boolean bool){isServerRunning = bool;}
 	public static ServerSocket getServerSocket(){return serverSocket;}
-	private static List<Socket> getListOfAllConnectedClients() {return listOfAllActiveClients;}
-	private static List<ChatRoom> getListOfAllActiveChatRooms() {return listOfAllActiveChatRooms;}
+	private static List<ConnectedClient> getListOfAllConnectedClients() {return listOfAllActiveClients;}
+	static List<ChatRoom> getListOfAllActiveChatRooms() {return listOfAllActiveChatRooms;}
 	
 	public static void main(String[] args){
 		try{
@@ -71,7 +71,7 @@ public class ChatServer {
 	}
 
 	private static void intialiseServerVariables() {
-		listOfAllActiveClients = new ArrayList<Socket>();
+		listOfAllActiveClients = new ArrayList<ConnectedClient>();
 		listOfAllActiveChatRooms = new ArrayList<ChatRoom>();
 		isServerRunning = true;
 		nextClientId = new AtomicInteger(0);
@@ -81,10 +81,10 @@ public class ChatServer {
 	private static void shutServerDown() {
 		try{
 			ErrorAndPrintHandler.printString("Shutting down server");
-			for(Socket socket : getListOfAllConnectedClients()){
-				socket.getInputStream().close();
-				socket.getOutputStream().close();
-				socket.close();
+			for(ConnectedClient connectedClient : getListOfAllConnectedClients()){
+				connectedClient.getSocket().close();
+				connectedClient.getPrintWriter().close();
+				connectedClient.getBufferedReader().close();
 			}
 			listOfAllActiveChatRooms.clear();
 			listOfAllActiveClients.clear();
@@ -94,43 +94,35 @@ public class ChatServer {
 		}
 	}
 	
-	static synchronized void recordChangeOfClientWithServer(RequestType requestType, Socket socket,
-			RequestTypeNode requestTypeNode) throws IOException{
-		if(requestTypeNode != null){
-			if((requestType.equals(RequestType.JoinChatroom)) && (!getListOfAllConnectedClients().contains(socket)) 
-					&& (getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()) != null)){
-				addClientToServer(socket);
-				return;
-			}else if((requestType.equals(RequestType.Disconnect)) && (getListOfAllConnectedClients().contains(socket))){
-				removeClientFromServer(socket, getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()));
-				return;
-			}
-		}
-	}
 
-	private static void removeClientFromServer(Socket socket, Object object) throws IOException {
-		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
-			if(chatRoom == object){
-				chatRoom.getListOfAllConnectedClients().remove(socket);
-				break;
+	private static void removeClientFromServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) throws IOException {
+		String clientLeftMessage = null;
+		if(getListOfAllConnectedClients().contains(connectedClient)){
+			for(ChatRoom chatRoom : listOfAllActiveChatRooms){
+				if(chatRoom.getListOfAllConnectedClients().contains(connectedClient)){
+					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
+					clientLeftMessage.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomRef(), requestTypeNode.getName(), "Client Has Left Chat Room");
+				}
 			}
-			listOfAllActiveClients.remove(socket);
-			socket.close();
-			return;
 		}
+		getListOfAllConnectedClients().remove(connectedClient);
 	}
 	
-	static void addClientToServer(Socket clientSocket) {
-		for(Socket socket : listOfAllActiveClients){
-			if(clientSocket == socket){
-				ErrorAndPrintHandler.printString("Client Not Added: Already present in Chat Room");
-				return;
+	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {
+		if((requestTypeNode.getRequestType().equals(RequestType.JoinChatroom)) && (!getListOfAllConnectedClients().contains(connectedClient)) 
+				&& (getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()) != null)){
+			for(ConnectedClient connectedClient1 : listOfAllActiveClients){
+				if(connectedClient1 == connectedClient){
+					ErrorAndPrintHandler.printString("Client already added to server.");
+					return;
+				}
 			}
+			getListOfAllConnectedClients().add(connectedClient);
+			ErrorAndPrintHandler.printString(String.format("Client: %s added", connectedClient.getId()));
 		}
-		listOfAllActiveClients.add(clientSocket);
 	}
 
-	private static synchronized ChatRoom getChatRoomByIdIfExist(String chatRoomId) {
+	static synchronized ChatRoom getChatRoomByIdIfExist(String chatRoomId) {
 		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
 			if(chatRoom.getChatRoomId().equals(chatRoomId)){
 				return chatRoom;

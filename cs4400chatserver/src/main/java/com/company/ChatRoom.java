@@ -31,16 +31,16 @@ public class ChatRoom implements Comparable<ChatRoom>{
 				return;
 			}
 		}
-		listOfAllConnectedClients.add(new ConnectedClient(socket, printWriter));
+		listOfAllConnectedClients.add(new ConnectedClient(chatRoomRefNumber, socket, null, printWriter));
 		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 	}
 	
-	public void removeClientRecord(Socket socket, RequestTypeNode requestTypeNode){
+	public void removeClientRecord(ConnectedClient connectedClient2, RequestTypeNode requestTypeNode){
 		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
-			if(connectedClient.getSocket().equals(socket)){
+			if(connectedClient.getSocket().equals(connectedClient2)){
 				this.listOfAllConnectedClients.remove(connectedClient);
 				System.out.println("Client " +requestTypeNode.getName() +  " was removed from chatroom!");
 				return;

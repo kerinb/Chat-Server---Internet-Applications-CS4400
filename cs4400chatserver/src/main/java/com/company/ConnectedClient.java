@@ -1,5 +1,6 @@
 package com.company;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -9,13 +10,13 @@ public class ConnectedClient {
 	
 	private volatile Socket socket;
 	private volatile PrintWriter printWriter; 
-	private volatile BufferedReader bufferedReader;
+	private volatile BufferedInputStream bufferedInputStream;
 	
-	public ConnectedClient(int id, Socket socket, BufferedReader bufferedReader, 
+	public ConnectedClient(int id, Socket socket, BufferedInputStream bufferedInputStream, 
 			PrintWriter printWriter){
 		this.id = id;
 		this.socket = socket;
-		this.bufferedReader = bufferedReader;
+		this.bufferedInputStream = bufferedInputStream;
 		this.printWriter = printWriter;
 	}
 	
@@ -28,6 +29,6 @@ public class ConnectedClient {
 	public Socket getSocket(){return this.socket;}
 	public void setSocket(Socket socket){this.socket = socket;}
 	
-	public BufferedReader getBufferedReader(){return this.bufferedReader;}
-	public void setBufferedReader(BufferedReader bufferedReader){this.bufferedReader = bufferedReader;}
+	public BufferedInputStream getBufferedReader(){return this.bufferedInputStream;}
+	public void setBufferedReader(BufferedInputStream bufferedInputStream){this.bufferedInputStream = bufferedInputStream;}
 }

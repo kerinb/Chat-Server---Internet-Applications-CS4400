@@ -1,6 +1,7 @@
 package com.company;
 
 import java.util.List;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -18,18 +19,15 @@ public class ClientThread extends Thread {
 	private static final String STUDENT_ID = "14310166"; 
 
 
-	PrintWriter  printWriter = null;
-	BufferedReader bufferedReader = null;
-	private Socket socket;
+	ConnectedClient connectedClient;
 	List<ChatRoom> chatRooms = null;
 	private int joinId;
 	private String clientName = null;
 	
 	public ClientThread(Socket socket){
 		try{
-			this.socket = socket;
-			this.printWriter = new PrintWriter(socket.getOutputStream());
-			this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			this.joinId = ChatServer.nextClientId.getAndIncrement();
+			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()), new PrintWriter(socket.getOutputStream()));
 		}catch(IOException e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when creating new client thread");
 		}
@@ -214,16 +212,12 @@ public class ClientThread extends Thread {
 			break;
 		case Chat:
 			return new RequestTypeNode(clientName, joinId, clientName);
-			break;	
 		case LeaveChatroom:
 			return new RequestTypeNode(clientName, joinId, clientName);
-			break;	
 		case KillService:
 			return new RequestTypeNode(clientName, joinId, clientName);
-			break;
 		case Disconnect:
 			return new RequestTypeNode(clientName, joinId, clientName);
-			break;	
 		default:
 			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", requestType));
 			return null;
