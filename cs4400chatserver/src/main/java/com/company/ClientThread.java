@@ -41,11 +41,22 @@ public class ClientThread extends Thread {
 	public void run(){
 		while(true){
 			try{
-				
+				while(this.connected){
+					try{
+						RequestTypeNode requestNodeType = clientRequestNode();
+					}catch(Exception e){
+						ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
+					}
+				}
 			}catch(){
 				
 			}
 		}
+	}
+
+	private RequestTypeNode clientRequestNode() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private void handleRequestByClient(RequestTypeNode requestTypeNode, RequestType requestType,
