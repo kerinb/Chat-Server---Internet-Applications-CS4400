@@ -41,20 +41,9 @@ public class ClientThread extends Thread {
 	public void run(){
 		while(true){
 			try{
-				List<String> dataReceivedFromClient = getEntireMessageSentByClient(this.socket);
-				RequestType requestType = actionRequestedByClient(dataReceivedFromClient);
-				if(requestType == null){
-					ErrorAndPrintHandler.printString("Could not parse request: Null value");
-					return;
-				}
-				RequestTypeNode requestTypeNode = ExtractInfoFromClient(this.socket, requestType, dataReceivedFromClient);
-				if(requestTypeNode == null){
-					ErrorAndPrintHandler.printString("Could not parse request type: Null value");
-					return;
-				}
-				handleRequestByClient(requestTypeNode, requestType, dataReceivedFromClient);
-			}catch(Exception e){
-				ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when running Client Thread");
+				
+			}catch(){
+				
 			}
 		}
 	}
@@ -116,12 +105,12 @@ public class ClientThread extends Thread {
 	private void handleKillServiceError(RequestTypeNode requestTypeNode, ErrorMessages killservice) {
 		String errorMessageToPrint = ResponceFromServer.ERROR.getValue() + killservice.getValue();
 		try{
-			this.socket.getOutputStream().write(errorMessageToPrint.getBytes());;
-		}catch(IOException e){
+			this.connectedClient.getPrintWriter().write(errorMessageToPrint);
+			}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Couldnt communicate failed killserver error to client");
 		}
 	}
-
+	
 	private void leaveChatRoom(RequestTypeNode requestTypeNode) {
 		String chatRoomRequestedToLeave =  requestTypeNode.getChatRoomId();
 		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving chatroom: %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
@@ -138,17 +127,17 @@ public class ClientThread extends Thread {
 				leaveChatRoom.broadcastMessageToEntireChatRoom(message);
 				
 				if(clientInChatRoom(leaveChatRoom)){
-					leaveChatRoom.removeClientRecord(socket, requestTypeNode);
+					leaveChatRoom.removeClientRecord(this.connectedClient, requestTypeNode);
 				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-
+	
 	private boolean clientInChatRoom(ChatRoom chatRoom) {
 		for(ConnectedClient connectedClient : chatRoom.getListOfAllConnectedClients()){
-			if(connectedClient.getSocket().equals(this.socket)){
+			if(connectedClient.getSocket().equals(this.connectedClient.getSocket())){
 				return true;
 			}
 		}
@@ -158,7 +147,7 @@ public class ClientThread extends Thread {
 	private void chat(RequestTypeNode requestTypeNode) {
 		
 	}
-
+	
 	private void joinChatRoom(RequestTypeNode requestTypeNode) {
 		String ChatRoomToJoin = requestTypeNode.getChatRoomId();
 		ErrorAndPrintHandler.printString(String.format("Joining ChatRoom: %s", requestTypeNode.getChatRoomId()));
@@ -170,11 +159,11 @@ public class ClientThread extends Thread {
 			}
 			if(requestedChatRoomToJoin == null){
 				requestedChatRoomToJoin = createChatRoom(chatRoomToJoin);
-				requestedChatRoomToJoin.addClientRecord(this.socket, requestTypeNode, this.printWriter);
+				requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
 				ChatServer.getListOfAllActiveChatRooms().add(requestedChatRoomToJoin);
 			}else{
 				try{
-					requestedChatRoomToJoin.addClientRecord(this.socket, requestTypeNode, this.printWriter);
+					requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
 				}catch(Exception e){
 					e.printStackTrace();
 					ErrorAndPrintHandler.printError(e.getMessage(), "Alread a member of chat room - resend join request");
@@ -201,8 +190,8 @@ public class ClientThread extends Thread {
 
 	private void writeToClient(String messageToBroadCast) {
 		try{
-			this.printWriter.print(messageToBroadCast);
-			this.printWriter.flush();
+			this.connectedClient.getPrintWriter().write(messageToBroadCast);
+			this.connectedClient.getPrintWriter().flush();
 		}catch(Exception e){
 			e.printStackTrace();
 		}
