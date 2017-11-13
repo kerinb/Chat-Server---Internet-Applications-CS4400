@@ -7,7 +7,9 @@ import java.util.List;
 
 public class ChatRoom implements Comparable<ChatRoom>{
 	private List<ConnectedClient>  listOfAllConnectedClients;
+	
 	private String chatRoomId;
+	
 	private Integer chatRoomRefNumber;
 	
 	// ChatRoom constructor

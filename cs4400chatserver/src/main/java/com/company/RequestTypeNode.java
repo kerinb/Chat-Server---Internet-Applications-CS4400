@@ -2,7 +2,7 @@ package com.company;
 
 import java.util.List;
 
-public class RequestTypeNode implements Comparable<RequestTypeNode>{
+public class RequestTypeNode{
 	private String clientName;
 	private Integer joinId;
 	private String chatRoomId;
@@ -25,18 +25,11 @@ public class RequestTypeNode implements Comparable<RequestTypeNode>{
 	public String getChatRoomId(){return chatRoomId;}
 	public void setChatRoomId(String chatRoomId){this.chatRoomId = chatRoomId;}
 	
+	public RequestType getRequestType(){return this.requestType;}
+	public void setRequestType(RequestType requestType){this.requestType = requestType;}
+	
 	public Integer getJoinId(){return joinId;}
 	public void setJoinId(Integer joinId){this.joinId = joinId;}
-
-	@Override
-	public int compareTo(RequestTypeNode o) {
-		if(this.getJoinId() < o.getJoinId()){
-			return -1;
-		}else if(this.getJoinId() > o.getJoinId()){
-			return 1;
-		}
-		return 0;
-	}
 	
 	@Override
 	public String toString(){

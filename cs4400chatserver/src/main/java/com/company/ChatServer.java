@@ -119,8 +119,8 @@ public class ChatServer {
 			return;
 		}
 	}
-
-	private static void addClientToServer(Socket clientSocket) {
+	
+	static void addClientToServer(Socket clientSocket) {
 		for(Socket socket : listOfAllActiveClients){
 			if(clientSocket == socket){
 				ErrorAndPrintHandler.printString("Client Not Added: Already present in Chat Room");
