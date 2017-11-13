@@ -1,40 +1,42 @@
 package com.company;
 
-import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 public class ChatRoom implements Comparable<ChatRoom>{
 	private List<ConnectedClient>  listOfAllConnectedClients;
 	private String chatRoomId;
-	private Integer chatRoomRef;
+	private Integer chatRoomRefNumber;
 	
 	// ChatRoom constructor
 	public ChatRoom(String RoomId, int chatRoomRef){
 		chatRoomId = RoomId;
-		this.chatRoomRef = chatRoomRef;
+		this.chatRoomRefNumber = chatRoomRef;
 		this.listOfAllConnectedClients = new ArrayList<ConnectedClient>();
 	}
 	
 	public List<ConnectedClient> getListOfAllConnectedClients(){return listOfAllConnectedClients;}
-	public Integer getChatRoomRef(){return chatRoomRef;}
+	public Integer getChatRoomRef(){return chatRoomRefNumber;}
 	public String getChatRoomId(){return chatRoomId;}
 
 	public void addClientRecord(Socket socket, RequestTypeNode requestTypeNode, PrintWriter printWriter){
+		ErrorAndPrintHandler.printString(String.format("Adding Client: %s to chatRoom: %s",requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
 			if(connectedClient.getSocket().equals(socket)){
 				return;
 			}
 		}
 		listOfAllConnectedClients.add(new ConnectedClient(socket, printWriter));
-		System.out.println("Client " +requestTypeNode.getName() +  " was added to chatroom!");
+		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));
 	}
 	
 	public void removeClientRecord(Socket socket, RequestTypeNode requestTypeNode){
+		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
 			if(connectedClient.getSocket().equals(socket)){
 				this.listOfAllConnectedClients.remove(connectedClient);
@@ -42,8 +44,8 @@ public class ChatRoom implements Comparable<ChatRoom>{
 				return;
 			}
 		}
-		System.out.println("Client " +requestTypeNode.getName() +  " was not part of chatroom!");
-	}
+		ErrorAndPrintHandler.printString(String.format("Removed Client: %s to chatRoom: %s",requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));	}
 
 	@Override
 	public int compareTo(ChatRoom o) {
@@ -56,6 +58,7 @@ public class ChatRoom implements Comparable<ChatRoom>{
 	}
 	
 	public synchronized void broadcastMessageToEntireChatRoom(String messageToBroadCast){
+		ErrorAndPrintHandler.printString(String.format("Preparing to broadcast %s to chatroom", messageToBroadCast));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
 			if(connectedClient.getSocket() != null){
 				connectedClient.getPrintWriter().print(messageToBroadCast);
@@ -64,6 +67,4 @@ public class ChatRoom implements Comparable<ChatRoom>{
 		}
 		System.out.println("Broadcasted messgae to chatroom");
 	}
-	
-	
 }

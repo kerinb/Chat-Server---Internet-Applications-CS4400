@@ -14,35 +14,35 @@ public class ChatServer {
 	
 	private static ServerSocket serverSocket;
 	
-	private static volatile boolean running;
+	private static volatile boolean isServerRunning;
 	
 	private static List<ChatRoom> listOfAllActiveChatRooms;
 	private static List<Socket> listOfAllActiveClients;
 	
 	static int serverPort;
+	
 	static String serverIP;
 	
 	public static int getServerPort(){return serverPort;}
 	public static String getServerIp(){return serverIP;}
-	public static void setRunningValue(boolean bool){running = bool;}
+	public static void setRunningValue(boolean bool){isServerRunning = bool;}
 	public static ServerSocket getServerSocket(){return serverSocket;}
 	private static List<Socket> getListOfAllConnectedClients() {return listOfAllActiveClients;}
 	private static List<ChatRoom> getListOfAllActiveChatRooms() {return listOfAllActiveChatRooms;}
-	
 	
 	public static void main(String[] args){
 		try{
 			initialiseServer(args[0]);
 			while(true){
-				if(running = false){
-					shutdown();
+				if(isServerRunning = false){
+					shutServerDown();
 				}
 				takeCareOfConnection();
 			}
 		}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");
 		}finally{
-			shutdown();
+			shutServerDown();
 		}
 	}
 
@@ -73,15 +73,17 @@ public class ChatServer {
 	private static void intialiseServerVariables() {
 		listOfAllActiveClients = new ArrayList<Socket>();
 		listOfAllActiveChatRooms = new ArrayList<ChatRoom>();
-		running = true;
+		isServerRunning = true;
 		nextClientId = new AtomicInteger(0);
 		nextChatRoomId = new AtomicInteger(0);
 	}
 
-	private static void shutdown() {
+	private static void shutServerDown() {
 		try{
 			ErrorAndPrintHandler.printString("Shutting down server");
 			for(Socket socket : getListOfAllConnectedClients()){
+				socket.getInputStream().close();
+				socket.getOutputStream().close();
 				socket.close();
 			}
 			listOfAllActiveChatRooms.clear();
