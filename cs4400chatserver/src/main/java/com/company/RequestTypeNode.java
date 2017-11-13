@@ -4,7 +4,6 @@ import java.util.List;
 
 public class RequestTypeNode{
 	private String clientName;
-	private Integer joinId;
 	private String chatRoomId;
 	private RequestType requestType;
 	private List<String> requestReceivedFromClient;
@@ -28,14 +27,12 @@ public class RequestTypeNode{
 	public RequestType getRequestType(){return this.requestType;}
 	public void setRequestType(RequestType requestType){this.requestType = requestType;}
 	
-	public Integer getJoinId(){return joinId;}
-	public void setJoinId(Integer joinId){this.joinId = joinId;}
+
 	
 	@Override
 	public String toString(){
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(String.format("Client Name: %s\n", this.getName()));
-		stringBuilder.append(String.format("JoinId: %s\n", this.getJoinId()));
 		return stringBuilder.toString();
 	}
 }

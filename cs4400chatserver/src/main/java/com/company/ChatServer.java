@@ -95,7 +95,7 @@ public class ChatServer {
 	}
 	
 
-	private static void removeClientFromServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) throws IOException {
+	 static void removeClientFromServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) throws IOException {
 		String clientLeftMessage = null;
 		if(getListOfAllConnectedClients().contains(connectedClient)){
 			for(ChatRoom chatRoom : listOfAllActiveChatRooms){

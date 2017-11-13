@@ -13,7 +13,9 @@ public class ClientThread extends Thread {
 	private static final String HELO = "HELO ";
 	private static final int UNKNOWN_JOIN_ID = -1;
 	private static final String JOIN_CHATROOM = "JOIN_CHATROOM: ";
+	private static final String CHAT= "CHAT: ";
 	private static final String CHATROOM_IDENTIFIER = "CHAT: ";
+	private static final String LEAVE_CHATROOM = "LEAVE_CHATROOM: ";
 	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
 	private static final String CLIENT_NAME = "CLIENT_NAME: ";
 	private static final String STUDENT_ID = "14310166"; 
@@ -22,11 +24,13 @@ public class ClientThread extends Thread {
 	ConnectedClient connectedClient;
 	List<ChatRoom> chatRooms = null;
 	private int joinId;
+	private boolean connected;
 	private String clientName = null;
 	
 	public ClientThread(Socket socket){
 		try{
 			this.joinId = ChatServer.nextClientId.getAndIncrement();
+			this.connected = true;
 			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()), new PrintWriter(socket.getOutputStream()));
 		}catch(IOException e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when creating new client thread");
@@ -82,11 +86,18 @@ public class ClientThread extends Thread {
 		}
 	}
 
-	private void disconnect(RequestTypeNode requestTypeNode) {
-		String chatRoom = requestTypeNode.getChatRoomId();
-		ErrorAndPrintHandler.printString(String.format("%s is disconnecting from server", requestTypeNode.getName()));
-		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByIdIfExist(requestTypeNode.getChatRoomId());
-		chatRoomOnRecord.removeClientRecord(socket, requestTypeNode);
+	private void disconnect(RequestTypeNode requestTypeNode)  {
+		this.connected = false;
+		try {
+			ChatServer.removeClientFromServer(connectedClient, requestTypeNode);
+			this.connectedClient.getBufferedReader().close();
+			this.connectedClient.getSocket().close();
+			this.connectedClient.getPrintWriter().close();
+		} catch (IOException e) {
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred When disconnecting from Server");
+			e.printStackTrace();
+		}
+		
 	}
 
 	private void killService(RequestTypeNode requestTypeNode) {
@@ -203,25 +214,34 @@ public class ClientThread extends Thread {
 		return chatRoom;
 	}
 
-	private RequestTypeNode ExtractInfoFromClient(Socket socket, RequestType requestType,
-			List<String> dataReceivedFromClient) {
-		switch(requestType){
+	public RequestTypeNode ExtractInfoFromClient(RequestType requestType, List<String> message) throws IOException {
+		switch (requestType) {
 		case JoinChatroom:
-			return new RequestTypeNode(dataReceivedFromClient.get(3).split(CLIENT_NAME, 0)[1], dataReceivedFromClient.get(0).split(JOIN_CHATROOM, 0)[1],
-					dataReceivedFromClient, requestType);
-			break;
+			return new RequestTypeNode(message.get(3).split(CLIENT_NAME, 0)[1],
+					message.get(0).split(JOIN_CHATROOM, 0)[1], message, requestType);
 		case Chat:
-			return new RequestTypeNode(clientName, joinId, clientName);
+			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1],
+					message.get(0).split(CHAT, 0)[1], message, requestType);
 		case LeaveChatroom:
-			return new RequestTypeNode(clientName, joinId, clientName);
-		case KillService:
-			return new RequestTypeNode(clientName, joinId, clientName);
+			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1],
+					message.get(0).split(LEAVE_CHATROOM, 0)[1], message, requestType);
 		case Disconnect:
-			return new RequestTypeNode(clientName, joinId, clientName);
-		default:
-			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", requestType));
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1], null, message, requestType);
+		case HELO:
+			ErrorAndPrintHandler.printString("Helo client node created");
+			return new RequestTypeNode(null, null, message, requestType);
+		case KillService:
+			return new RequestTypeNode(null, null, message, requestType);
+		case Null:
 			return null;
+		default:
+			ErrorAndPrintHandler.printString("Null clientnode created: no match with expected request types");
+			return null;
+		}
 	}
+	
 
 	private RequestType actionRequestedByClient(List<String> dataReceivedFromClient) {
 		// TODO Auto-generated method stub
