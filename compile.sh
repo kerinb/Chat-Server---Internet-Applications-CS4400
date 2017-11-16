@@ -9,6 +9,6 @@
 echo "Running compilation"
 
 # Compile 
-javac -cp src/main/java/com/company/*.java
+javac src/main/java/com/company/*.java
 
 echo "Done"
