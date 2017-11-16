@@ -1,4 +1,4 @@
-package com.company;
+package main.java;
 
 import java.io.PrintWriter;
 import java.net.Socket;

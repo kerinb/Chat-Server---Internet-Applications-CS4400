@@ -1,4 +1,4 @@
-package com.company;
+package main.java;
 
 public class Resources {
 	public static final String STUDENT_ID = "14310166";

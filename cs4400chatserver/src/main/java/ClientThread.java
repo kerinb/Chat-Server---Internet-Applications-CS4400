@@ -1,4 +1,4 @@
-package com.company;
+package main.java;
 
 import java.util.List;
 import java.io.BufferedInputStream;
@@ -48,7 +48,7 @@ public class ClientThread extends Thread {
 						ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
 					}
 				}
-			}catch(){
+			}catch(Exception e){
 				
 			}
 		}
