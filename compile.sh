@@ -9,6 +9,6 @@
 echo "Running compilation"
 
 # Compile 
-javac src/main/java/com/company/*.java
+javac cs4400chatserver/src/main/java/com/company/*.java
 
 echo "Done"
