@@ -105,7 +105,10 @@ public class ClientThread extends Thread {
 			break;
 		case Disconnect:
 			disconnect(requestTypeNode);
-			break;	
+			break;
+		case HELO:
+			helo(requestTypeNode);
+			break;
 		default:
 			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", 
 					requestTypeNode.getRequestType()));
