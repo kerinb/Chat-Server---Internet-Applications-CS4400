@@ -2,3 +2,10 @@
 *.snap
 *.prefs
 .metadata/
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/write.lock
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.tis
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.prx
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.fdx
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.nrm
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.frq
+.recommenders/index/http___download_eclipse_org_recommenders_models_mars_/_6.fdt
