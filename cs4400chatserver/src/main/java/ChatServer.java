@@ -72,7 +72,7 @@ public class ChatServer {
 		serverIP = InetAddress.getLocalHost().getHostAddress().toString();
 		System.out.println(serverIP);
 		intialiseServerVariables();
-		ErrorAndPrintHandler.printString(String.format("Server has begun running on port number: %i", serverPort));
+		ErrorAndPrintHandler.printString(String.format("Server has begun running on port number: %s", serverPort));
 	}
 
 	private static void intialiseServerVariables() {
