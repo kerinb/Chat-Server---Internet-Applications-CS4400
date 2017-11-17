@@ -309,16 +309,17 @@ public class ClientThread extends Thread {
 	}
 
 	private List<String> getEntireMessageSentByClient() {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
-			int res = this.connectedClient.getBufferedReader().read();
-			while(res != -1){
-				out.write((byte) res);
-				res = this.connectedClient.getBufferedReader().read();
+			int result = this.connectedClient.getBufferedReader().read();
+			while ((result != -1) && (this.connectedClient.getBufferedReader().available() > 0)) {
+				outputStream.write((byte) result);
+				result = this.connectedClient.getBufferedReader().read();
 			}
-			String fromClient = out.toString("UTF-8");
-			List<String> message = getAsArrayList(fromClient);
-			return message;
+			// Assuming UTF-8 encoding
+			String inFromClient = outputStream.toString("UTF-8");
+			List<String> lines = getAsArrayList(inFromClient);
+			return lines;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
