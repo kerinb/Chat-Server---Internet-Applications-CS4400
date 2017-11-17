@@ -95,17 +95,10 @@ public class ChatServer {
 	}
 	
 
-	 static void removeClientFromServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) throws IOException {
-		String clientLeftMessage = null;
-		if(getListOfAllConnectedClients().contains(connectedClient)){
-			for(ChatRoom chatRoom : listOfAllActiveChatRooms){
-				if(chatRoom.getListOfAllConnectedClients().contains(connectedClient)){
-					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
-					clientLeftMessage.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomRef(), requestTypeNode.getName(), "Client Has Left Chat Room");
-				}
-			}
-		}
-		getListOfAllConnectedClients().remove(connectedClient);
+	 static void removeClientFromServer(RequestTypeNode requestTypeNode) throws IOException {
+		String chatRoomToLeave = requestTypeNode.getChatRoomId();
+		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving the chatroom: %s",requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));
 	}
 	
 	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {

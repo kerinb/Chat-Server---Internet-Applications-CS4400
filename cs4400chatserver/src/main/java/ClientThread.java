@@ -11,7 +11,6 @@ import java.net.Socket;
 public class ClientThread extends Thread {
 	private static final String PATTERN_SPLITTER = ": ";
 	private static final String HELO = "HELO ";
-	private static final int UNKNOWN_JOIN_ID = -1;
 	private static final String JOIN_CHATROOM = "JOIN_CHATROOM: ";
 	private static final String CHAT= "CHAT: ";
 	private static final String CHATROOM_IDENTIFIER = "CHAT: ";
@@ -19,7 +18,7 @@ public class ClientThread extends Thread {
 	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
 	private static final String CLIENT_NAME = "CLIENT_NAME: ";
 	private static final String STUDENT_ID = "14310166"; 
-
+	private static final int UNKNOWN_JOIN_ID = -1;
 
 	ConnectedClient connectedClient;
 	List<ChatRoom> chatRooms = null;
@@ -31,7 +30,8 @@ public class ClientThread extends Thread {
 		try{
 			this.joinId = ChatServer.nextClientId.getAndIncrement();
 			this.connected = true;
-			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()), new PrintWriter(socket.getOutputStream()));
+			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()),
+					new PrintWriter(socket.getOutputStream()));
 		}catch(IOException e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when creating new client thread");
 		}
@@ -39,33 +39,63 @@ public class ClientThread extends Thread {
 	
 	@Override
 	public void run(){
-		while(true){
-			try{
-				while(this.connected){
-					try{
-						RequestTypeNode requestNodeType = clientRequestNode();
-					}catch(Exception e){
-						ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
+		try{
+			while(true){
+				try{
+					while(this.connected){
+						try{
+							RequestTypeNode requestTypeNode  = clientRequestNode();
+							if(requestTypeNode == null){
+								if(this.connected == false){
+									ErrorAndPrintHandler.printString("Couldnt read: invalid request type given");
+									return;
+								}else{
+									continue;
+								}
+							}
+							handleRequestByClient(requestTypeNode);
+						}catch(Exception e){
+							ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
+						}
 					}
+				}catch(Exception e){
+					e.getStackTrace();
 				}
-			}catch(Exception e){
-				
 			}
+		}catch(Exception e){
+			e.getStackTrace();
+		}finally{
+			ErrorAndPrintHandler.printString(String.format("Thread: %s finished...", this.getId()));
 		}
 	}
 
 	private RequestTypeNode clientRequestNode() {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			List<String>  messageFromClient = getEntireMessageSentByClient();
+			if(messageFromClient == null){
+				ErrorAndPrintHandler.printString("null message cent by cleint");
+				return null;
+			}
+			RequestType requestType = actionRequestedByClient(messageFromClient);
+			if(requestType == null){
+				ErrorAndPrintHandler.printString("null message cent by cleint");
+				return null;
+			}
+			return getInfoFromClient(requestType, messageFromClient);
+			
+		}catch(IOException e){
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when packaging client request");
+			e.printStackTrace();
+			return null;
+		}
 	}
 
-	private void handleRequestByClient(RequestTypeNode requestTypeNode, RequestType requestType,
-			List<String> dataReceivedFromClient) {
+	private void handleRequestByClient(RequestTypeNode requestTypeNode) {
 		if(requestTypeNode == null){
 			ErrorAndPrintHandler.printString("requestTypeNode was null: invalid value");
 			return;
 		}
-		switch(requestType){
+		switch(requestTypeNode.getRequestType()){
 		case JoinChatroom:
 			joinChatRoom(requestTypeNode);
 			break;
@@ -82,14 +112,15 @@ public class ClientThread extends Thread {
 			disconnect(requestTypeNode);
 			break;	
 		default:
-			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", requestType));
+			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", 
+					requestTypeNode.getRequestType()));
 		}
 	}
 
 	private void disconnect(RequestTypeNode requestTypeNode)  {
 		this.connected = false;
 		try {
-			ChatServer.removeClientFromServer(connectedClient, requestTypeNode);
+			ChatServer.removeClientFromServer(requestTypeNode);
 			this.connectedClient.getBufferedReader().close();
 			this.connectedClient.getSocket().close();
 			this.connectedClient.getPrintWriter().close();
@@ -214,7 +245,7 @@ public class ClientThread extends Thread {
 		return chatRoom;
 	}
 
-	public RequestTypeNode ExtractInfoFromClient(RequestType requestType, List<String> message) throws IOException {
+	public RequestTypeNode getInfoFromClient(RequestType requestType, List<String> message) throws IOException {
 		switch (requestType) {
 		case JoinChatroom:
 			return new RequestTypeNode(message.get(3).split(CLIENT_NAME, 0)[1],
@@ -248,7 +279,7 @@ public class ClientThread extends Thread {
 		return null;
 	}
 
-	private List<String> getEntireMessageSentByClient(Socket socket2) {
+	private List<String> getEntireMessageSentByClient() {
 		// TODO Auto-generated method stub
 		return null;
 	}
