@@ -21,10 +21,8 @@ public class ClientThread extends Thread {
 	private static final int UNKNOWN_JOIN_ID = -1;
 
 	ConnectedClient connectedClient;
-	List<ChatRoom> chatRooms = null;
 	private int joinId;
 	private boolean connected;
-	private String clientName = null;
 	
 	public ClientThread(Socket socket){
 		try{
@@ -33,40 +31,35 @@ public class ClientThread extends Thread {
 			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()),
 					new PrintWriter(socket.getOutputStream()));
 		}catch(IOException e){
+			e.printStackTrace();
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when creating new client thread");
 		}
 	}
 	
 	@Override
 	public void run(){
-		try{
-			while(true){
-				try{
-					while(this.connected){
-						try{
-							RequestTypeNode requestTypeNode  = clientRequestNode();
-							if(requestTypeNode == null){
-								if(this.connected == false){
-									ErrorAndPrintHandler.printString("Couldnt read: invalid request type given");
-									return;
-								}else{
-									continue;
-								}
+			try{
+				while(this.connected){
+					try{
+						RequestTypeNode requestTypeNode  = clientRequestNode();
+						if(requestTypeNode == null){
+							if(this.connected == false){
+								ErrorAndPrintHandler.printString("Couldnt read: invalid request type given");
+								return;
+							}else{
+								continue;
 							}
-							handleRequestByClient(requestTypeNode);
-						}catch(Exception e){
-							ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
 						}
+						handleRequestByClient(requestTypeNode);
+					}catch(Exception e){
+						ErrorAndPrintHandler.printError(e.getMessage(), "Exception occurered when running thread");;
 					}
-				}catch(Exception e){
-					e.getStackTrace();
 				}
+			}catch(Exception e){
+				e.getStackTrace();
+			}finally{
+				ErrorAndPrintHandler.printString(String.format("Thread: %s finished...", this.getId()));
 			}
-		}catch(Exception e){
-			e.getStackTrace();
-		}finally{
-			ErrorAndPrintHandler.printString(String.format("Thread: %s finished...", this.getId()));
-		}
 	}
 
 	private RequestTypeNode clientRequestNode() {
