@@ -34,7 +34,7 @@ public class ChatServer {
 		try{
 			initialiseServer(args[0]);
 			while(true){
-				if(isServerRunning = false){
+				if(isServerRunning == false){
 					shutServerDown();
 				}
 				takeCareOfConnection();
@@ -68,6 +68,7 @@ public class ChatServer {
 		serverSocket = new ServerSocket(serverPort);
 		serverIP = InetAddress.getLocalHost().getHostAddress().toString();
 		intialiseServerVariables();
+		ErrorAndPrintHandler.printString(String.format("Server has begun running on port number: %i", serverPort));
 	}
 
 	private static void intialiseServerVariables() {
