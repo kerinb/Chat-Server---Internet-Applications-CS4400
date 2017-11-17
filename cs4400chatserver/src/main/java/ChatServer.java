@@ -41,6 +41,7 @@ public class ChatServer {
 			}
 		}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");
+			e.printStackTrace();
 		}finally{
 			shutServerDown();
 		}
@@ -65,8 +66,11 @@ public class ChatServer {
 
 	private static void initialiseServer(String string) throws IOException {
 		serverPort = Integer.parseInt(string);
+		System.out.println(serverPort);
 		serverSocket = new ServerSocket(serverPort);
+		System.out.println(serverSocket);
 		serverIP = InetAddress.getLocalHost().getHostAddress().toString();
+		System.out.println(serverIP);
 		intialiseServerVariables();
 		ErrorAndPrintHandler.printString(String.format("Server has begun running on port number: %i", serverPort));
 	}
