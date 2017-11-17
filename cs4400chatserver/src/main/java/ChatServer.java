@@ -59,6 +59,7 @@ public class ChatServer {
 
 	private static Socket maintainNewConenction() throws IOException {
 		Socket socket = serverSocket.accept();
+		ErrorAndPrintHandler.printString("Received connection from " + socket.getInetAddress().toString());
 		socket.setKeepAlive(true);
 		socket.setTcpNoDelay(true);
 		return socket;

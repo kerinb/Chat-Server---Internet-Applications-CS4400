@@ -65,6 +65,7 @@ public class ClientThread extends Thread {
 	private RequestTypeNode clientRequestNode() {
 		try{
 			List<String>  messageFromClient = getEntireMessageSentByClient();
+			ErrorAndPrintHandler.printString("Message from client: " + messageFromClient);
 			if(messageFromClient == null){
 				ErrorAndPrintHandler.printString("null message cent by cleint");
 				return null;
@@ -296,6 +297,7 @@ public class ClientThread extends Thread {
 	private RequestType actionRequestedByClient(List<String> dataReceivedFromClient) {
 		String[] request = dataReceivedFromClient.get(0).split(PATTERN_SPLITTER,0);
 		if(request[0].contains(HELO)){
+			ErrorAndPrintHandler.printString("Request Type was HELO");
 			String temp = request[0];
 			String[] split =  temp.split(" ", 0);
 			request[0] = split[0];
