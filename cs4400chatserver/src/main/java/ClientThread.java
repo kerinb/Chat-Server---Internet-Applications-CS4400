@@ -83,7 +83,7 @@ public class ClientThread extends Thread {
 		}
 	}
 
-	private void handleRequestByClient(RequestTypeNode requestTypeNode) {
+	private synchronized void handleRequestByClient(RequestTypeNode requestTypeNode) {
 		if(requestTypeNode == null){
 			ErrorAndPrintHandler.printString("requestTypeNode was null: invalid value");
 			return;
@@ -91,6 +91,7 @@ public class ClientThread extends Thread {
 		switch(requestTypeNode.getRequestType()){
 		case JoinChatroom:
 			joinChatRoom(requestTypeNode);
+			ChatServer.addClientToServer(this.connectedClient, requestTypeNode);
 			break;
 		case Chat:
 			chat(requestTypeNode);
@@ -110,8 +111,9 @@ public class ClientThread extends Thread {
 		}
 	}
 
-	private void disconnect(RequestTypeNode requestTypeNode)  {
+	private synchronized void disconnect(RequestTypeNode requestTypeNode)  {
 		this.connected = false;
+		ErrorAndPrintHandler.printString(String.format("Disconnecting thread %s from server......", this.getId()));
 		try {
 			ChatServer.removeClientFromServer(requestTypeNode, connectedClient);
 			this.connectedClient.getSocket().close();
@@ -124,7 +126,7 @@ public class ClientThread extends Thread {
 		}
 	}
 
-	private void killService(RequestTypeNode requestTypeNode) {
+	private synchronized void killService(RequestTypeNode requestTypeNode) {
 		ErrorAndPrintHandler.printString(String.format("Client: %s requested to kill server", requestTypeNode.getName()));
 		ChatServer.setRunningValue(false);
 		try{
