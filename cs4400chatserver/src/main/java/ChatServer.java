@@ -95,10 +95,22 @@ public class ChatServer {
 	}
 	
 
-	 static void removeClientFromServer(RequestTypeNode requestTypeNode) throws IOException {
-		String chatRoomToLeave = requestTypeNode.getChatRoomId();
+	 static void removeClientFromServer(RequestTypeNode requestTypeNode, ConnectedClient connectedClient) throws IOException {
 		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving the chatroom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
+		if(getListOfAllConnectedClients().contains(connectedClient)){
+			for(ChatRoom chatRoom : getListOfAllActiveChatRooms()){
+				if(chatRoom.getListOfAllConnectedClients().contains(connectedClient)){
+					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
+					ErrorAndPrintHandler.printString(String.format("Removes Client: %s Fom chatroom: %s", 
+							connectedClient.getId(), chatRoom.getChatRoomId()));
+					String message = String.format("%s has left chat room %s", requestTypeNode.getName(), chatRoom.getChatRoomId());
+					String clientLeaveMessage = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomRef(),
+							requestTypeNode.getName(), message);
+					chatRoom.broadcastMessageToEntireChatRoom(clientLeaveMessage);
+				}
+			}
+		}
 	}
 	
 	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {
@@ -124,7 +136,7 @@ public class ChatServer {
 		return null;
 	}
 		
-	private static ChatRoom getChatRoomByRefIfExist(String chatRoomRef){
+	public static ChatRoom getChatRoomByRefIfExist(String chatRoomRef){
 		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
 			if(chatRoom.getChatRoomRef().equals(chatRoomRef)){
 				return chatRoom;

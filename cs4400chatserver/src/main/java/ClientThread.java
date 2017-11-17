@@ -1,10 +1,10 @@
 package main.java;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -120,15 +120,15 @@ public class ClientThread extends Thread {
 	private void disconnect(RequestTypeNode requestTypeNode)  {
 		this.connected = false;
 		try {
-			ChatServer.removeClientFromServer(requestTypeNode);
-			this.connectedClient.getBufferedReader().close();
+			ChatServer.removeClientFromServer(requestTypeNode, connectedClient);
 			this.connectedClient.getSocket().close();
+			this.connectedClient.getBufferedReader().close();
+			this.connectedClient.getPrintWriter().flush();
 			this.connectedClient.getPrintWriter().close();
 		} catch (IOException e) {
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred When disconnecting from Server");
 			e.printStackTrace();
 		}
-		
 	}
 
 	private void killService(RequestTypeNode requestTypeNode) {
@@ -153,6 +153,20 @@ public class ClientThread extends Thread {
 		}
 	}
 	
+	private static void helo(RequestTypeNode requestTypeNode){
+		try{
+			ErrorAndPrintHandler.printString(getHelo(requestTypeNode.getRequestsReceivedFromClient()));
+		}catch(Exception e){
+			e.printStackTrace();
+			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when saying helo");
+		}
+	}
+	
+	private static String getHelo(List<String> requestsReceivedFromClient) {
+		return String.format(ResponceFromServer.HELO.getValue(), requestsReceivedFromClient.get(0).split(HELO)[1].replaceAll("\n", ""),
+				ChatServer.serverIP,ChatServer.serverPort,STUDENT_ID);
+	}
+
 	private void leaveChatRoom(RequestTypeNode requestTypeNode) {
 		String chatRoomRequestedToLeave =  requestTypeNode.getChatRoomId();
 		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving chatroom: %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
@@ -187,7 +201,15 @@ public class ClientThread extends Thread {
 	}
 
 	private void chat(RequestTypeNode requestTypeNode) {
-		
+		String chatMessage = requestTypeNode.getRequestsReceivedFromClient().get(3).split(PATTERN_SPLITTER, 0)[1];
+		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByRefIfExist(requestTypeNode.getChatRoomId());
+		if(chatRoomOnRecord == null){
+			ErrorAndPrintHandler.printString("chatroom non existant...");
+			return;
+		}
+		String responce = String.format(ResponceFromServer.CHAT.getValue(), chatRoomOnRecord.getChatRoomRef(),
+				requestTypeNode.getName(), chatMessage);
+		ErrorAndPrintHandler.printString(responce);
 	}
 	
 	private void joinChatRoom(RequestTypeNode requestTypeNode) {
@@ -200,10 +222,12 @@ public class ClientThread extends Thread {
 				this.joinId = ChatServer.nextClientId.getAndIncrement();
 			}
 			if(requestedChatRoomToJoin == null){
-				requestedChatRoomToJoin = createChatRoom(chatRoomToJoin);
+				requestedChatRoomToJoin = createNewChatRoom(chatRoomToJoin);
 				requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
 				ChatServer.getListOfAllActiveChatRooms().add(requestedChatRoomToJoin);
 			}else{
+				ErrorAndPrintHandler.printString(String.format("ChatRoom: %s alread exist... Adding Client: %s to chatroom", requestTypeNode.getChatRoomId()
+						, requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 				try{
 					requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
 				}catch(Exception e){
@@ -239,7 +263,7 @@ public class ClientThread extends Thread {
 		}
 	}
 
-	private ChatRoom createChatRoom(String chatRoomToJoin) {
+	private ChatRoom createNewChatRoom(String chatRoomToJoin) {
 		ChatRoom chatRoom = new ChatRoom(chatRoomToJoin, ChatServer.nextChatRoomId.getAndIncrement());
 		ErrorAndPrintHandler.printString("Created a new chatroom" + chatRoom.getChatRoomId());
 		return chatRoom;
@@ -275,12 +299,42 @@ public class ClientThread extends Thread {
 	
 
 	private RequestType actionRequestedByClient(List<String> dataReceivedFromClient) {
-		// TODO Auto-generated method stub
-		return null;
+		String[] request = dataReceivedFromClient.get(0).split(PATTERN_SPLITTER,0);
+		if(request[0].contains(HELO)){
+			String temp = request[0];
+			String[] split =  temp.split(" ", 0);
+			request[0] = split[0];
+		}
+		String val = request[0];
+		RequestType requestType = RequestType.valueOf(val);
+		ErrorAndPrintHandler.printString("Request Type: " + val);
+		return requestType;
 	}
 
 	private List<String> getEntireMessageSentByClient() {
-		// TODO Auto-generated method stub
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			int res = this.connectedClient.getBufferedReader().read();
+			while(res != -1){
+				out.write((byte) res);
+				res = this.connectedClient.getBufferedReader().read();
+			}
+			String fromClient = out.toString("UTF-8");
+			List<String> message = getAsArrayList(fromClient);
+			return message;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
+	}
+
+	private List<String> getAsArrayList(String fromClient) {
+		String[] lines = fromClient.split("\n");
+		List<String> linesToReturn = new ArrayList<String>();
+		for(String line: lines){
+			linesToReturn.add(line);
+		}
+		return linesToReturn;
 	}
 }
