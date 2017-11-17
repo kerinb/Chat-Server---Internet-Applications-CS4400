@@ -13,7 +13,6 @@ public class ClientThread extends Thread {
 	private static final String HELO = "HELO ";
 	private static final String JOIN_CHATROOM = "JOIN_CHATROOM: ";
 	private static final String CHAT= "CHAT: ";
-	private static final String CHATROOM_IDENTIFIER = "CHAT: ";
 	private static final String LEAVE_CHATROOM = "LEAVE_CHATROOM: ";
 	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
 	private static final String CLIENT_NAME = "CLIENT_NAME: ";
@@ -39,6 +38,7 @@ public class ClientThread extends Thread {
 	@Override
 	public void run(){
 			try{
+				ErrorAndPrintHandler.printString(String.format("Running Thread: ", this.getId()));
 				while(this.connected){
 					try{
 						RequestTypeNode requestTypeNode  = clientRequestNode();
@@ -168,17 +168,20 @@ public class ClientThread extends Thread {
 
 	private void leaveChatRoom(RequestTypeNode requestTypeNode) {
 		String chatRoomRequestedToLeave =  requestTypeNode.getChatRoomId();
-		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving chatroom: %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
+		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving chatroom: %s\n", requestTypeNode.getName(), 
+				requestTypeNode.getChatRoomId()));
 		try{
 			String chatRoomToLeave = chatRoomRequestedToLeave;
 			ChatRoom leaveChatRoom = ChatServer.getChatRoomByIdIfExist(chatRoomToLeave);
 			if(leaveChatRoom != null){
 				if(clientInChatRoom(leaveChatRoom)){
-					String messageToClient = String.format("Client: %s has left chatRoom: %s", requestTypeNode.getName(), requestTypeNode.getChatRoomId());
+					String messageToClient = String.format("Client: %s has left chatRoom: %s", requestTypeNode.getName(),
+							requestTypeNode.getChatRoomId());
 					writeToClient(messageToClient);
 				}
 				String clientExitFromChatroom = String.format("%s has left chatroom\n", requestTypeNode.getName());
-				String message = String.format(ResponceFromServer.CHAT.getValue(), leaveChatRoom.getChatRoomRef(), requestTypeNode.getName(), clientExitFromChatroom);
+				String message = String.format(ResponceFromServer.CHAT.getValue(), leaveChatRoom.getChatRoomRef(), requestTypeNode.getName(), 
+						clientExitFromChatroom);
 				leaveChatRoom.broadcastMessageToEntireChatRoom(message);
 				
 				if(clientInChatRoom(leaveChatRoom)){
@@ -222,13 +225,14 @@ public class ClientThread extends Thread {
 			}
 			if(requestedChatRoomToJoin == null){
 				requestedChatRoomToJoin = createNewChatRoom(chatRoomToJoin);
-				requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
+				ErrorAndPrintHandler.printString(String.format("Created ChatRoom %s ",chatRoomToJoin ));
+				requestedChatRoomToJoin.addClientRecord(this.connectedClient, requestTypeNode);
 				ChatServer.getListOfAllActiveChatRooms().add(requestedChatRoomToJoin);
 			}else{
-				ErrorAndPrintHandler.printString(String.format("ChatRoom: %s alread exist... Adding Client: %s to chatroom", requestTypeNode.getChatRoomId()
-						, requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
+				ErrorAndPrintHandler.printString(String.format("ChatRoom: %s alread exist... Adding Client: %s to chatroom", 
+						requestTypeNode.getChatRoomId(), requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 				try{
-					requestedChatRoomToJoin.addClientRecord(this.connectedClient.getSocket(), requestTypeNode, this.connectedClient.getPrintWriter());
+					requestedChatRoomToJoin.addClientRecord(this.connectedClient, requestTypeNode);
 				}catch(Exception e){
 					e.printStackTrace();
 					ErrorAndPrintHandler.printError(e.getMessage(), "Alread a member of chat room - resend join request");
@@ -248,8 +252,10 @@ public class ClientThread extends Thread {
 				ChatServer.getServerPort(), requestedChatRoomToJoin.getChatRoomRef(),  this.joinId);
 		writeToClient(messageToClient);
 		
-		String messageToBroadCast = String.format("Client: %s jhas joined the chatroom %s\n", requestTypeNode.getName(), requestTypeNode.getChatRoomId());
-		String message = String.format(ResponceFromServer.CHAT.getValue(), requestedChatRoomToJoin.getChatRoomRef(), requestTypeNode.getName(), messageToBroadCast);
+		String messageToBroadCast = String.format("Client: %s jhas joined the chatroom %s\n", requestTypeNode.getName(),
+				requestTypeNode.getChatRoomId());
+		String message = String.format(ResponceFromServer.CHAT.getValue(), requestedChatRoomToJoin.getChatRoomRef(), requestTypeNode.getName(), 
+				messageToBroadCast);
 		requestedChatRoomToJoin.broadcastMessageToEntireChatRoom(message);
 	}
 

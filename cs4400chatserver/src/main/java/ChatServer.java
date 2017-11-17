@@ -66,6 +66,7 @@ public class ChatServer {
 	}
 
 	private static void initialiseServer(String string) throws IOException {
+		ErrorAndPrintHandler.printString("Initialising server");
 		serverPort = Integer.parseInt(string);
 		System.out.println(serverPort);
 		serverSocket = new ServerSocket(serverPort);
@@ -77,6 +78,7 @@ public class ChatServer {
 	}
 
 	private static void intialiseServerVariables() {
+		ErrorAndPrintHandler.printString("Initialising server variables");
 		listOfAllActiveClients = new ArrayList<ConnectedClient>();
 		listOfAllActiveChatRooms = new ArrayList<ChatRoom>();
 		isServerRunning = true;
@@ -95,6 +97,7 @@ public class ChatServer {
 			listOfAllActiveChatRooms.clear();
 			listOfAllActiveClients.clear();
 			serverSocket.close();
+			ErrorAndPrintHandler.printString("Shut down server");
 		}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Error Occurred when shutting down server");
 		}
@@ -120,6 +123,7 @@ public class ChatServer {
 	}
 	
 	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {
+		ErrorAndPrintHandler.printString(String.format("Adding Client %s to server", requestTypeNode.getName()));
 		if((requestTypeNode.getRequestType().equals(RequestType.JoinChatroom)) && (!getListOfAllConnectedClients().contains(connectedClient)) 
 				&& (getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()) != null)){
 			for(ConnectedClient connectedClient1 : listOfAllActiveClients){

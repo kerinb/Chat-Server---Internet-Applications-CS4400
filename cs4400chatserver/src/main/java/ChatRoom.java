@@ -23,15 +23,15 @@ public class ChatRoom implements Comparable<ChatRoom>{
 	public Integer getChatRoomRef(){return chatRoomRefNumber;}
 	public String getChatRoomId(){return chatRoomId;}
 
-	public void addClientRecord(Socket socket, RequestTypeNode requestTypeNode, PrintWriter printWriter){
+	public void addClientRecord(ConnectedClient connectedClient, RequestTypeNode requestTypeNode){
 		ErrorAndPrintHandler.printString(String.format("Adding Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
-		for(ConnectedClient connectedClient : listOfAllConnectedClients){
-			if(connectedClient.getSocket().equals(socket)){
+		for(ConnectedClient connectedClient1 : listOfAllConnectedClients){
+			if(connectedClient1.getSocket().equals(connectedClient.getSocket())){
 				return;
 			}
 		}
-		listOfAllConnectedClients.add(new ConnectedClient(chatRoomRefNumber, socket, null, printWriter));
+		listOfAllConnectedClients.add(new ConnectedClient(chatRoomRefNumber, connectedClient.getSocket(), null, connectedClient.getPrintWriter()));
 		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 	}
