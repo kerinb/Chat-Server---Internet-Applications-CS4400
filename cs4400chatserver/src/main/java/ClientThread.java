@@ -232,13 +232,13 @@ public class ClientThread extends Thread {
 	private void chat(RequestTypeNode requestTypeNode) {
 		String chatMessage = requestTypeNode.getRequestsReceivedFromClient().get(3).split(PATTERN_SPLITTER, 0)[1];
 		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByRefIfExist(Integer.parseInt(requestTypeNode.getChatRoomId()));
-		if(chatRoomOnRecord == null){
-			ErrorAndPrintHandler.printString("chatroom non existant...");
-			return;
+		if(chatRoomOnRecord != null){
+			String broadcastMEssage = String.format(ResponceFromServer.CHAT.getValue(), chatRoomOnRecord.getChatRoomRef(),
+					requestTypeNode.getName(), chatMessage);
+			chatRoomOnRecord.broadcastMessageToEntireChatRoom(broadcastMEssage);
 		}
-		String broadcastMEssage = String.format(ResponceFromServer.CHAT.getValue(), chatRoomOnRecord.getChatRoomRef(),
-				requestTypeNode.getName(), chatMessage);
-		chatRoomOnRecord.broadcastMessageToEntireChatRoom(broadcastMEssage);
+		ErrorAndPrintHandler.printString("chatroom non existant...");
+		return;
 	}
 	
 	private void joinChatRoom(RequestTypeNode requestTypeNode) {
