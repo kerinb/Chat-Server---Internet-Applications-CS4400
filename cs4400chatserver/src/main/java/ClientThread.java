@@ -161,7 +161,7 @@ public class ClientThread extends Thread {
 		}
 	}
 	
-	private static void helo(RequestTypeNode requestTypeNode){
+	private void helo(RequestTypeNode requestTypeNode){
 		try{
 			String messageToClient = makeHeloResponce(requestTypeNode);
 			writeToClient(messageToClient);
