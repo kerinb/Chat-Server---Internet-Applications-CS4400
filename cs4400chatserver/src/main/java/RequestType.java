@@ -1,8 +1,8 @@
 package main.java;
 
 public enum RequestType {
-	HelloText("HELO text\n"), JoinChatroom("JOIN_CHATROOM"), Chat("CHAT"), LeaveChatroom("LEAVE_CHATROOM"), KillService(
-			"KILL_SERVICE"), Disconnect("DISCONNECT"), HELO("HELO"), Null("NULL");
+	HELOP_TEXT("HELO text\n"), JOIN_CHATROOM("JOIN_CHATROOM"), CHAT("CHAT"), LEAVE_CHATROOM("LEAVE_CHATROOM"), 
+	KILL_SERVICE("KILL_SERVICE"), DISCONNECT("DISCONNECT"), HELO("HELO"), Null("");
 
 	private String value;
 
