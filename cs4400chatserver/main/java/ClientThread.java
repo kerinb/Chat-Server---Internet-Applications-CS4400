@@ -1,5 +1,6 @@
 package main.java;
 
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -280,7 +281,7 @@ public class ClientThread extends Thread {
 		String messageToClient = String.format(ResponceFromServer.JOIN.getValue(),
 				requestedChatRoomToJoin.getChatRoomId(), ChatServer.serverIP,
 				ChatServer.serverPort, requestedChatRoomToJoin.getChatRoomRef(),  this.joinId);
-		writeToClient(messageToClient);
+		requestedChatRoomToJoin.broadcastMessageToEntireChatRoom(messageToClient);
 		
 		String messageToBroadCast = String.format("%s has joined chatroom %s", requestTypeNode.getName(),
 				requestTypeNode.getChatRoomId());
