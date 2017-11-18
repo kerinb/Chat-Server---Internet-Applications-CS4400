@@ -140,6 +140,7 @@ public class ChatServer {
 
 	static synchronized ChatRoom getChatRoomByIdIfExist(String chatRoomId) {
 		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
+			ErrorAndPrintHandler.printString("Room#: " + chatRoom.getChatRoomId());
 			if(chatRoom.getChatRoomId().equals(chatRoomId)){
 				return chatRoom;
 			}
