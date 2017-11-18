@@ -1,4 +1,4 @@
-package src.main.java;
+package main.java;
 
 public enum ErrorMessages {
 	InvalidRequest(0, "Invalid request provided"), JoinChatroom(1,
