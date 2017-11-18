@@ -231,7 +231,7 @@ public class ClientThread extends Thread {
 
 	private void chat(RequestTypeNode requestTypeNode) {
 		String chatMessage = requestTypeNode.getRequestsReceivedFromClient().get(3).split(PATTERN_SPLITTER, 0)[1];
-		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByRefIfExist(requestTypeNode.getChatRoomId());
+		ChatRoom chatRoomOnRecord = ChatServer.getChatRoomByRefIfExist(Integer.parseInt(requestTypeNode.getChatRoomId()));
 		if(chatRoomOnRecord == null){
 			ErrorAndPrintHandler.printString("chatroom non existant...");
 			return;
