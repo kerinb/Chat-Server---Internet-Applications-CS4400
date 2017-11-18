@@ -148,9 +148,10 @@ public class ChatServer {
 		return null;
 	}
 		
-	public static ChatRoom getChatRoomByRefIfExist(String chatRoomRef){
+	public static ChatRoom getChatRoomByRefIfExist(int chatRoomRef){
 		ErrorAndPrintHandler.printString(String.format("Checking server if client ref: %s exists....", chatRoomRef));
 		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
+			ErrorAndPrintHandler.printString("Chatroom: " + chatRoom.getChatRoomRef());
 			if(chatRoom.getChatRoomRef().equals(chatRoomRef)){
 				ErrorAndPrintHandler.printString("Chatroom found");
 				return chatRoom;
