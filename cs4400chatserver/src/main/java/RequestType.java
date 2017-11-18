@@ -1,4 +1,4 @@
-package main.java;
+package src.main.java;
 
 public enum RequestType {
 	HelloText("HELO text\n"), JoinChatroom("JOIN_CHATROOM"), Chat("CHAT"), LeaveChatroom("LEAVE_CHATROOM"), KillService(

@@ -1,12 +1,12 @@
-package main.java;
+package src.main.java;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientThread extends Thread {
 	private static final String PATTERN_SPLITTER = ": ";
@@ -114,12 +114,21 @@ public class ClientThread extends Thread {
 		case Disconnect:
 			disconnect(requestTypeNode);
 			break;
-		case HELO:
+		case HELO: 
 			helo(requestTypeNode);
 			break;
 		default:
-			ErrorAndPrintHandler.printString(String.format("Invalid Request: will not be processed\n%s", 
-					requestTypeNode.getRequestType()));
+			handlerErrorProcessingRequest(ErrorMessages.InvalidRequest, requestTypeNode);
+		}
+	}
+
+	private void handlerErrorProcessingRequest(ErrorMessages invalidrequest, RequestTypeNode requestTypeNode) {
+		String errorMessage = String.format(ResponceFromServer.ERROR.getValue(), invalidrequest.getValue(),
+				invalidrequest.getDescription());
+		try{
+			this.connectedClient.getPrintWriter().write(errorMessage);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 
