@@ -98,20 +98,20 @@ public class ClientThread extends Thread {
 			return;
 		}
 		switch(requestTypeNode.getRequestType()){
-		case JOIN_CHATROOM:
+		case JoinChatroom:
 			joinChatRoom(requestTypeNode);
 			ChatServer.addClientToServer(this.connectedClient, requestTypeNode);
 			break;
-		case CHAT:
+		case Chat:
 			chat(requestTypeNode);
 			break;	
-		case LEAVE_CHATROOM:
+		case LeaveChatroom:
 			leaveChatRoom(requestTypeNode);
 			break;	
-		case KILL_SERVICE:
+		case KillService:
 			killService(requestTypeNode);
 			break;
-		case DISCONNECT:
+		case Disconnect:
 			disconnect(requestTypeNode);
 			break;
 		case HELO:
@@ -292,23 +292,23 @@ public class ClientThread extends Thread {
 
 	public RequestTypeNode getInfoFromClient(RequestType requestType, List<String> message) throws IOException {
 		switch (requestType) {
-		case JOIN_CHATROOM:
+		case JoinChatroom:
 			return new RequestTypeNode(message.get(3).split(CLIENT_NAME, 0)[1],
 					message.get(0).split(JOIN_CHATROOM, 0)[1], message, requestType);
-		case CHAT:
+		case Chat:
 			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
 			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1],
 					message.get(0).split(CHAT, 0)[1], message, requestType);
-		case LEAVE_CHATROOM:
+		case LeaveChatroom:
 			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
 			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1],
 					message.get(0).split(LEAVE_CHATROOM, 0)[1], message, requestType);
-		case DISCONNECT:
+		case Disconnect:
 			return new RequestTypeNode(message.get(2).split(CLIENT_NAME, 0)[1], null, message, requestType);
 		case HELO:
 			ErrorAndPrintHandler.printString("Helo client node created");
 			return new RequestTypeNode(null, null, message, requestType);
-		case KILL_SERVICE:
+		case KillService:
 			return new RequestTypeNode(null, null, message, requestType);
 		case Null:
 			return null;
