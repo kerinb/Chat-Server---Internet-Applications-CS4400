@@ -124,7 +124,7 @@ public class ChatServer {
 	
 	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {
 		ErrorAndPrintHandler.printString(String.format("Adding Client %s to server", requestTypeNode.getName()));
-		if((requestTypeNode.getRequestType().equals(RequestType.JoinChatroom)) && 
+		if((requestTypeNode.getRequestType().equals(RequestType.JOIN_CHATROOM)) && 
 				(!getListOfAllConnectedClients().contains(connectedClient)) 
 				&& (getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()) != null)){
 			for(ConnectedClient connectedClient1 : listOfAllActiveClients){
