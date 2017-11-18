@@ -329,23 +329,26 @@ public class ClientThread extends Thread {
 	
 
 	private RequestType actionRequestedByClient(List<String> dataReceivedFromClient) {
-		String[] request = dataReceivedFromClient.get(0).split(PATTERN_SPLITTER,0);
-		if(request[0].contains(HELO)){
-			ErrorAndPrintHandler.printString("Request Type was HELO");
-			String temp = request[0];
-			String[] split =  temp.split(" ", 0);
-			request[0] = split[0];
-		}
-		String val = request[0];
+		String request = parseRequestType(dataReceivedFromClient);
 		try{
-			RequestType requestType = RequestType.valueOf(val);
-			ErrorAndPrintHandler.printString("Request Type: " + val);
+			RequestType requestType = RequestType.valueOf(request);
+			ErrorAndPrintHandler.printString("Parsed request is: " + requestType.getValue());
 			return requestType;
 		}catch(Exception e){
 			e.printStackTrace();
-			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when parsing request by client \n");
 			return null;
 		}
+	}
+
+	private String parseRequestType(List<String> dataReceivedFromClient) {
+		String[] requestTypeString = dataReceivedFromClient.get(0).split(PATTERN_SPLITTER, 0);
+		if(requestTypeString[0].contains("HELO")){
+			String temp = requestTypeString[0];
+			String[] splitString = temp.split(" ", 0);
+			requestTypeString[0] = splitString[0];
+		}
+		ErrorAndPrintHandler.printString("Parsed request is: " + requestTypeString[0]);
+		return requestTypeString[0];
 	}
 
 	private List<String> getEntireMessageSentByClient() {
