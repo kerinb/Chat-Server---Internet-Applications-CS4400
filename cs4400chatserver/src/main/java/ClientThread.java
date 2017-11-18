@@ -343,7 +343,6 @@ public class ClientThread extends Thread {
 			ErrorAndPrintHandler.printString("Parsed request is: " + requestType.getValue());
 			return requestType;
 		}catch(Exception e){
-			e.printStackTrace();
 			return null;
 		}
 	}
