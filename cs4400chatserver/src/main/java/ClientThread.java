@@ -193,9 +193,9 @@ public class ClientThread extends Thread {
 				requestTypeNode.getChatRoomId()));
 		try{
 			ChatRoom leaveChatRoom = ChatServer.getChatRoomByIdIfExist(chatRoomRequestedToLeave);
-			
+			ErrorAndPrintHandler.printString(String.format("%s", leaveChatRoom.getChatRoomId())); 
 			if(leaveChatRoom != null){
-				
+				ErrorAndPrintHandler.printString(String.format("%s", clientInChatRoom(leaveChatRoom))); 
 				if(clientInChatRoom(leaveChatRoom)){
 					String messageToClient = String.format(ResponceFromServer.LEAVE.getValue(), 
 							leaveChatRoom.getChatRoomRef(), this.joinId);
