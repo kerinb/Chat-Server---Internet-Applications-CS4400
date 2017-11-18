@@ -282,7 +282,8 @@ public class ClientThread extends Thread {
 				ChatServer.serverPort, requestedChatRoomToJoin.getChatRoomRef(),  this.joinId);
 		writeToClient(messageToClient);
 		
-		String messageToBroadCast = String.format("%s has joined this chatroom", requestTypeNode.getName());
+		String messageToBroadCast = String.format("%s has joined chatroom %s", requestTypeNode.getName(),
+				requestTypeNode.getChatRoomId());
 		String message = String.format(ResponceFromServer.CHAT.getValue(), requestedChatRoomToJoin.getChatRoomRef(),
 				requestTypeNode.getName(), 
 				messageToBroadCast);
