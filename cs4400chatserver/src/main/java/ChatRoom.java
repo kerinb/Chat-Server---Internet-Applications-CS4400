@@ -1,15 +1,11 @@
 package main.java;
 
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatRoom implements Comparable<ChatRoom>{
 	private List<ConnectedClient>  listOfAllConnectedClients;
-	
 	private String chatRoomId;
-	
 	private Integer chatRoomRefNumber;
 	
 	// ChatRoom constructor
@@ -23,11 +19,11 @@ public class ChatRoom implements Comparable<ChatRoom>{
 	public Integer getChatRoomRef(){return chatRoomRefNumber;}
 	public String getChatRoomId(){return chatRoomId;}
 
-	public void addClientRecord(ConnectedClient connectedClient, RequestTypeNode requestTypeNode){
+	public void addClientRecordToChatRoom(ConnectedClient connectedClient, RequestTypeNode requestTypeNode){
 		ErrorAndPrintHandler.printString(String.format("Adding Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient1 : listOfAllConnectedClients){
-			if(connectedClient1.getSocket().equals(connectedClient.getSocket())){
+			if(connectedClient1 == connectedClient){
 				return;
 			}
 		}
@@ -36,7 +32,7 @@ public class ChatRoom implements Comparable<ChatRoom>{
 				requestTypeNode.getChatRoomId()));
 	}
 	
-	public void removeClientRecord(ConnectedClient connectedClient2, RequestTypeNode requestTypeNode){
+	public void removeClientRecord(ConnectedClient connectedClient2, RequestTypeNode requestTypeNode) throws Exception{
 		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
@@ -63,8 +59,13 @@ public class ChatRoom implements Comparable<ChatRoom>{
 		ErrorAndPrintHandler.printString(String.format("Preparing to broadcast %s to chatroom", messageToBroadCast));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
 			if(connectedClient.getSocket() != null){
-				connectedClient.getPrintWriter().print(messageToBroadCast);
-				connectedClient.getPrintWriter().flush();
+				try{
+					connectedClient.getPrintWriter().print(messageToBroadCast);
+					connectedClient.getPrintWriter().flush();
+				}catch(Exception e){
+					ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when trying to broadcast message to chatrom");
+					e.printStackTrace();
+				}
 			}
 		}
 		System.out.println("Broadcasted messgae to chatroom");

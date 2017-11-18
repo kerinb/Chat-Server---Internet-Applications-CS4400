@@ -4,9 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ConnectedClient {
+public class ConnectedClient implements Comparable<ConnectedClient>{
 	private int id; 
-	
 	private volatile Socket socket;
 	private volatile PrintWriter printWriter; 
 	private volatile BufferedInputStream bufferedInputStream;
@@ -30,4 +29,14 @@ public class ConnectedClient {
 	
 	public BufferedInputStream getBufferedReader(){return this.bufferedInputStream;}
 	public void setBufferedReader(BufferedInputStream bufferedInputStream){this.bufferedInputStream = bufferedInputStream;}
+
+	@Override
+	public int compareTo(ConnectedClient o) {
+		if(this.getId()>o.getId()){
+			return 1;
+		}else if(this.getId()< o.getId()){
+			return -1;
+		}
+		return 0;
+	}
 }
