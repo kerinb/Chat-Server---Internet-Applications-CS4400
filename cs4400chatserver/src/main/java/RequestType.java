@@ -2,7 +2,7 @@ package main.java;
 
 public enum RequestType {
 	HelloText("HELO text\n"), JoinChatroom("JOIN_CHATROOM"), Chat("CHAT"), LeaveChatroom("LEAVE_CHATROOM"), KillService(
-			"KILL_SERVICE\n"), Disconnect("DISCONNECT"), HELO("HELO"), Null("");
+			"KILL_SERVICE"), Disconnect("DISCONNECT"), HELO("HELO"), Null("NULL");
 
 	private String value;
 
