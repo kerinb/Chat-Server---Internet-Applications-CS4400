@@ -36,14 +36,14 @@ public class ChatRoom implements Comparable<ChatRoom>{
 		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
-			if(connectedClient ==connectedClient2){
+			if(connectedClient.getId() == connectedClient2.getId()){
 				this.listOfAllConnectedClients.remove(connectedClient);
 				System.out.println("Client " +requestTypeNode.getName() +  " was removed from chatroom!");
 				return;
 			}
 		}
-		ErrorAndPrintHandler.printString(String.format("Removed Client: %s to chatRoom: %s",requestTypeNode.getName(), 
-				requestTypeNode.getChatRoomId()));	}
+		throw new Exception("Client:" + connectedClient2.getId() + " wasnt found in chatroom....");
+	}
 
 	@Override
 	public int compareTo(ChatRoom o) {
