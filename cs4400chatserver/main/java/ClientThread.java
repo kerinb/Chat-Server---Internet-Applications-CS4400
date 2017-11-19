@@ -210,7 +210,7 @@
   					writeToClient(messageToClient);
   				}
   				
-  				String clientExitFromChatroom = String.format("%s has left chatroom", requestTypeNode.getName());
+  				String clientExitFromChatroom = String.format("%s has left chatroom\n", requestTypeNode.getName());
   				String message = String.format(ResponceFromServer.CHAT.getValue(), leaveChatRoom.getChatRoomRef(), 
   						requestTypeNode.getName(), 
   						clientExitFromChatroom);

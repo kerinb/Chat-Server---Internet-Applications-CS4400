@@ -110,7 +110,7 @@ public class ChatServer {
 					ErrorAndPrintHandler.printString(String.format("Removes Client: %s Fom chatroom: %s", 
 							connectedClient.getId(), chatRoom.getChatRoomId()));
 					
-					String message = String.format("%s has left this chat room", requestTypeNode.getName());
+					String message = String.format("%s has left this chatroom", requestTypeNode.getName());
 					
 					String clientLeaveMessage = String.format(ResponceFromServer.CHAT.getValue(), 
 							chatRoom.getChatRoomRef(), requestTypeNode.getName(), message);
