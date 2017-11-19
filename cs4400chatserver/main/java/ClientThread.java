@@ -40,7 +40,7 @@
    	public void run(){
    			try{
    				ErrorAndPrintHandler.printString(String.format("Running Thread: ", this.getId()));
-   				while(this.connected && ChatServer.running){
+   				while(this.connected && ChatServer.getRunningValue()){
    					try{
    						RequestTypeNode requestTypeNode  = clientRequestNode();
    						if(requestTypeNode == null){
