@@ -194,7 +194,7 @@ package main.java;
  		try{
  			ChatRoom leaveChatRoom = ChatServer.getChatRoomByRefIfExist((Integer.parseInt(chatRoomRequestedToLeave)));
  			if(leaveChatRoom != null){
- 				ErrorAndPrintHandler.printString(String.format("%s", clientInChatRoom(leaveChatRoom))); 
+ 				//ErrorAndPrintHandler.printString(String.format("%s", clientInChatRoom(leaveChatRoom))); 
  				if(clientInChatRoom(leaveChatRoom)){
  					String messageToClient = String.format(ResponceFromServer.LEAVE.getValue(), 
  							leaveChatRoom.getChatRoomRef(), this.joinId);

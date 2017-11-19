@@ -36,7 +36,7 @@ public class ChatRoom implements Comparable<ChatRoom>{
 		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
-			if(connectedClient.equals(connectedClient2)){
+			if(connectedClient ==connectedClient2){
 				this.listOfAllConnectedClients.remove(connectedClient);
 				System.out.println("Client " +requestTypeNode.getName() +  " was removed from chatroom!");
 				return;
