@@ -40,19 +40,21 @@ package main.java;
  	public void run(){
  			try{
  				ErrorAndPrintHandler.printString(String.format("Running Thread: ", this.getId()));
- 				while(this.connected && (ChatServer.getRunningValue()==true)){
+ 				while(this.connected){
  					try{
- 						RequestTypeNode requestTypeNode  = clientRequestNode();
- 						if(requestTypeNode == null){
- 							ErrorAndPrintHandler.printString("Couldnt read: invalid request type given");
- 							if(this.connected == false){
- 								ErrorAndPrintHandler.printString("Connected = false...\n shutting server down....");
- 								return;
- 							}else{
- 								continue;
- 							}
+ 						if(ChatServer.getRunningValue()){
+	 						RequestTypeNode requestTypeNode  = clientRequestNode();
+	 						if(requestTypeNode == null){
+	 							ErrorAndPrintHandler.printString("Couldnt read: invalid request type given");
+	 							if(this.connected == false){
+	 								ErrorAndPrintHandler.printString("Connected = false...\n shutting server down....");
+	 								return;
+	 							}else{
+	 								continue;
+	 							}
+	 						}
+	 						handleRequestByClient(requestTypeNode);
  						}
- 						handleRequestByClient(requestTypeNode);
  						break;
  					}catch(Exception e){
  						if(this.connected == false){
