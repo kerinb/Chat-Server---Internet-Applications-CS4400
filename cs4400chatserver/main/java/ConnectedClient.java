@@ -11,9 +11,8 @@ public class ConnectedClient implements Comparable<ConnectedClient>{
 	private volatile PrintWriter printWriter; 
 	private volatile BufferedInputStream bufferedInputStream;
 	
-	public ConnectedClient(Socket clientSocket, PrintWriter printWriter2, BufferedInputStream bufferedInputStream, 
-			int joinId){
-		this.socket  = clientSocket;
+	public ConnectedClient(int joinId, Socket socket2, BufferedInputStream bufferedInputStream, PrintWriter printWriter2){
+		this.socket  = socket2;
 		this.printWriter = printWriter2;
 		this.bufferedInputStream = bufferedInputStream;
 		this.id= joinId;
