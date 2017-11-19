@@ -27,7 +27,7 @@ public class ChatRoom implements Comparable<ChatRoom>{
 				return;
 			}
 		}
-		listOfAllConnectedClients.add(new ConnectedClient(chatRoomRefNumber, connectedClient.getSocket(), null, connectedClient.getPrintWriter()));
+		listOfAllConnectedClients.add(connectedClient);
 		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
 	}
