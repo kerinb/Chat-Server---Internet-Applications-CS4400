@@ -23,7 +23,6 @@ public class ChatServer {
 	public static String getServerIp(){return serverIP;}
 	public static void setRunningValue(boolean boolValue){isServerRunning = boolValue;}
 	public static ServerSocket getServerSocket(){return serverSocket;}
-	public static boolean getRunningValue(){return isServerRunning;}
 	private static List<ConnectedClient> getListOfAllConnectedClients() {return listOfAllActiveClients;}
 	static List<ChatRoom> getListOfAllActiveChatRooms() {return listOfAllActiveChatRooms;}
 	
