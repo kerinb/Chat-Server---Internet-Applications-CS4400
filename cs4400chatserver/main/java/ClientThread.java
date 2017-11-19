@@ -40,7 +40,7 @@ package main.java;
  	public void run(){
  			try{
  				ErrorAndPrintHandler.printString(String.format("Running Thread: ", this.getId()));
- 				while(this.connected){
+ 				while(this.connected && ChatServer.getRunningValue()){
  					try{
  						RequestTypeNode requestTypeNode  = clientRequestNode();
  						if(requestTypeNode == null){
@@ -81,7 +81,7 @@ package main.java;
  			}
  			ErrorAndPrintHandler.printString("Getting Request Type for request");
  			RequestType requestType = actionRequestedByClient(messageFromClient);
- 			ErrorAndPrintHandler.printString("Got Request Type for request");
+ 			ErrorAndPrintHandler.printString(String.format("Got Request Type for request", requestType.getValue()));
  			if(requestType == null){
  				ErrorAndPrintHandler.printString("null message cent by cleint");
  				return null;
@@ -162,6 +162,7 @@ package main.java;
  		try{
  			join();// wait for thread to die... 
  		}catch(InterruptedException e){
+ 			ErrorAndPrintHandler.printString("In catch statement for kill service function"));
  			e.printStackTrace();
  			ErrorAndPrintHandler.printError(e.getMessage(), "Issue with killing service");
  		}
