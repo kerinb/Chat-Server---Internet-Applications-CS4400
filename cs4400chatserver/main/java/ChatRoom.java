@@ -35,7 +35,9 @@ public class ChatRoom implements Comparable<ChatRoom>{
 	public void removeClientRecord(ConnectedClient connectedClient2, RequestTypeNode requestTypeNode) throws Exception{
 		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
 				requestTypeNode.getChatRoomId()));
+		ErrorAndPrintHandler.printString(String.format("Client to remove: %s", connectedClient2.getId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
+			ErrorAndPrintHandler.printString(String.format("Check client: %s", connectedClient.getId()));
 			if(connectedClient.getId() == connectedClient2.getId()){
 				this.listOfAllConnectedClients.remove(connectedClient);
 				System.out.println("Client " +requestTypeNode.getName() +  " was removed from chatroom!");
