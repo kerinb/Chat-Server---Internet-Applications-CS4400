@@ -105,7 +105,6 @@ public class ChatServer {
 			for(ChatRoom chatRoom : getListOfAllActiveChatRooms()){
 				
 				if(chatRoom.getListOfAllConnectedClients().contains(connectedClient)){
-					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
 					
 					ErrorAndPrintHandler.printString(String.format("Removes Client: %s Fom chatroom: %s", 
 							connectedClient.getId(), chatRoom.getChatRoomId()));
@@ -115,7 +114,7 @@ public class ChatServer {
 					String clientLeaveMessage = String.format(ResponceFromServer.CHAT.getValue(), 
 							chatRoom.getChatRoomRef(), requestTypeNode.getName(), message);
 					chatRoom.broadcastMessageToEntireChatRoom(clientLeaveMessage);
-
+					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
 					ErrorAndPrintHandler.printString(String.format("Broadcasted message to chatroom: %s",
 							chatRoom.getChatRoomId()));
 				}
