@@ -165,7 +165,7 @@ package main.java;
  		try{
  			join();// wait for thread to die... 
  		}catch(InterruptedException e){
- 			ErrorAndPrintHandler.printString("In catch statement for kill service function"));
+ 			ErrorAndPrintHandler.printString("In catch statement for kill service function");
  			e.printStackTrace();
  			ErrorAndPrintHandler.printError(e.getMessage(), "Issue with killing service");
  		}
