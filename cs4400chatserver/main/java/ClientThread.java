@@ -355,7 +355,6 @@ package main.java;
  			String[] splitString = temp.split(" ", 0);
  			requestTypeString[0] = splitString[0];
  		}
- 		ErrorAndPrintHandler.printString("Parsed request is: " + requestTypeString[0]);
  		return requestTypeString[0];
  	}
  
