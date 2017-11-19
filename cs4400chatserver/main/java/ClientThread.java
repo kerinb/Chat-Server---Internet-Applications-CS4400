@@ -146,10 +146,10 @@
   		ErrorAndPrintHandler.printString(String.format("Disconnecting thread %s from server......", this.getId()));
   		try {
   			ChatServer.removeClientFromServer(requestTypeNode, connectedClient);
-  			this.connectedClient.getSocket().close();
-  			this.connectedClient.getBufferedReader().close();
-  			this.connectedClient.getPrintWriter().flush();
-  			this.connectedClient.getPrintWriter().close();
+//  			this.connectedClient.getSocket().close();
+//  			this.connectedClient.getBufferedReader().close();
+//  			this.connectedClient.getPrintWriter().flush();
+//  			this.connectedClient.getPrintWriter().close();
   		} catch (Exception e) {
   			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred When disconnecting from Server");
   			e.printStackTrace();
