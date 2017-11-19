@@ -79,7 +79,9 @@ package main.java;
  				ErrorAndPrintHandler.printString("null message cent by cleint");
  				return null;
  			}
+ 			ErrorAndPrintHandler.printString("Getting Request Type for request");
  			RequestType requestType = actionRequestedByClient(messageFromClient);
+ 			ErrorAndPrintHandler.printString("Got Request Type for request");
  			if(requestType == null){
  				ErrorAndPrintHandler.printString("null message cent by cleint");
  				return null;
@@ -100,22 +102,28 @@ package main.java;
  		}
  		switch(requestTypeNode.getRequestType()){
  		case JOIN_CHATROOM:
+ 			ErrorAndPrintHandler.printString("Calling Join function");
  			joinChatRoom(requestTypeNode);
  			ChatServer.addClientToServer(this.connectedClient, requestTypeNode);
  			break;
  		case CHAT:
+ 			ErrorAndPrintHandler.printString("Calling Chat function");
  			chat(requestTypeNode);
  			break;	
  		case LEAVE_CHATROOM:
+ 			ErrorAndPrintHandler.printString("Calling leave function");
  			leaveChatRoom(requestTypeNode);
  			break;	
  		case KILL_SERVICE:
+ 			ErrorAndPrintHandler.printString("Calling kill server function");
  			killService(requestTypeNode);
  			break;
  		case DISCONNECT:
+ 			ErrorAndPrintHandler.printString("Calling disconnect function");
  			disconnect(requestTypeNode);
  			break;
  		case HELO: 
+ 			ErrorAndPrintHandler.printString("Calling helo function");
  			helo(requestTypeNode);
  			break;
  		default:
@@ -311,24 +319,30 @@ package main.java;
  	public RequestTypeNode getInfoFromClient(RequestType requestType, List<String> message) throws IOException {
  		switch (requestType) {
  		case JOIN_CHATROOM:
+ 			ErrorAndPrintHandler.printString("Getting info from client - JOIN");
  			return new RequestTypeNode(message.get(3).split(CLIENT_NAME_ID, 0)[1],
  					message.get(0).split(JOIN_CHATROOM_ID, 0)[1], message, requestType);
  		case CHAT:
+ 			ErrorAndPrintHandler.printString("Getting info from client - CHAT");
  			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
  			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1],
  					message.get(0).split(CHAT_ID, 0)[1], message, requestType);
  		case LEAVE_CHATROOM:
+ 			ErrorAndPrintHandler.printString("Getting info from client - LEAVE");
  			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
  			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1],
  					message.get(0).split(LEAVE_CHATROOM_ID, 0)[1], message, requestType);
  		case DISCONNECT:
+ 			ErrorAndPrintHandler.printString("Getting info from client - DISCONNECT");
  			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1], null, message, requestType);
  		case HELO:
  			ErrorAndPrintHandler.printString("Helo client node created");
  			return new RequestTypeNode(null, null, message, requestType);
  		case KILL_SERVICE:
+ 			ErrorAndPrintHandler.printString("Getting info from client - KILL SERVER");
  			return new RequestTypeNode(null, null, message, requestType);
  		case Null:
+ 			ErrorAndPrintHandler.printString("Getting info from client - NULL");
  			return null;
  		default:
  			ErrorAndPrintHandler.printString("Null clientnode created: no match with expected request types");
