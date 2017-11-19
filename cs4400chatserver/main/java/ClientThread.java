@@ -12,14 +12,14 @@ import java.util.List;
 
 public class ClientThread extends Thread {
 
-	private static final String SPLIT_PATTERN = ": ";
-	private static final String HELO_IDENTIFIER = "HELO ";
+	private static final String PATTERN_SPLITTER = ": ";
+	private static final String HELO_ID = "HELO ";
 	private static final int UNDEFINED_JOIN_ID = -1;
-	private static final String JOIN_CHATROOM_IDENTIFIER = "JOIN_CHATROOM: ";
-	private static final String CHAT_IDENTIFIER = "CHAT: ";
-	private static final String LEAVE_CHATROOM_IDENTIFIER = "LEAVE_CHATROOM: ";
-	private static final String JOIN_ID_IDENTIFIER = "JOIN_ID: ";
-	private static final String CLIENT_NAME_IDENTIFIER = "CLIENT_NAME: ";
+	private static final String JOIN_CHATROOM_ID= "JOIN_CHATROOM: ";
+	private static final String CHAT_ID= "CHAT: ";
+	private static final String LEAVE_CHATROOM_ID= "LEAVE_CHATROOM: ";
+	private static final String JOIN_ID_ID= "JOIN_ID: ";
+	private static final String CLIENT_NAME_ID= "CLIENT_NAME: ";
 	public static final String STUDENT_ID = "14310166";
 
 	private volatile ConnectedClient connectionObject;
@@ -277,13 +277,13 @@ public class ClientThread extends Thread {
 
 	private String constructHelloResponse(List<String> receivedFromClient) {
 		String helloResponse = String.format(ResponceFromServer.HELO.getValue(),
-				receivedFromClient.get(0).split(HELO_IDENTIFIER)[1].replaceAll("\n", ""), ChatServer.serverIP,
+				receivedFromClient.get(0).split(HELO_ID)[1].replaceAll("\n", ""), ChatServer.serverIP,
 				ChatServer.serverPort, STUDENT_ID);
 		return helloResponse;
 	}
 
 	private void chat(RequestTypeNode clientNode) throws IOException {
-		String message = clientNode.getRequestsReceivedFromClient().get(3).split(SPLIT_PATTERN, 0)[1];
+		String message = clientNode.getRequestsReceivedFromClient().get(3).split(PATTERN_SPLITTER, 0)[1];
 		ChatRoom chatroomAlreadyOnRecord = ChatServer
 				.getChatRoomByIdIfExist(clientNode.getChatRoomId());
 		if (chatroomAlreadyOnRecord != null) {
@@ -339,18 +339,18 @@ public class ClientThread extends Thread {
 	public RequestTypeNode extractClientInfo(RequestType requestType, List<String> message) throws IOException {
 		switch (requestType) {
 		case JOIN_CHATROOM:
-			return new RequestTypeNode(message.get(3).split(CLIENT_NAME_IDENTIFIER, 0)[1],
-					message.get(0).split(JOIN_CHATROOM_IDENTIFIER, 0)[1], message, requestType);
+			return new RequestTypeNode(message.get(3).split(CLIENT_NAME_ID, 0)[1],
+					message.get(0).split(JOIN_CHATROOM_ID, 0)[1], message, requestType);
 		case CHAT:
-			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
-			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_IDENTIFIER, 0)[1],
-					message.get(0).split(CHAT_IDENTIFIER, 0)[1], message, requestType);
+			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_ID, 0)[1]);
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1],
+					message.get(0).split(CHAT_ID, 0)[1], message, requestType);
 		case LEAVE_CHATROOM:
-			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_IDENTIFIER, 0)[1]);
-			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_IDENTIFIER, 0)[1],
-					message.get(0).split(LEAVE_CHATROOM_IDENTIFIER, 0)[1], message, requestType);
+			this.joinId = Integer.parseInt(message.get(1).split(JOIN_ID_ID, 0)[1]);
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1],
+					message.get(0).split(LEAVE_CHATROOM_ID, 0)[1], message, requestType);
 		case DISCONNECT:
-			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_IDENTIFIER, 0)[1], null, message, requestType);
+			return new RequestTypeNode(message.get(2).split(CLIENT_NAME_ID, 0)[1], null, message, requestType);
 		case HELO:
 			ErrorAndPrintHandler.printString("Helo client node created");
 			return new RequestTypeNode(null, null, message, requestType);
@@ -377,7 +377,7 @@ public class ClientThread extends Thread {
 	}
 
 	private String parseRequestTypeType(List<String> message) throws IOException {
-		String[] requestType = message.get(0).split(SPLIT_PATTERN, 0);
+		String[] requestType = message.get(0).split(PATTERN_SPLITTER, 0);
 		if (requestType[0].contains("HELO")) {
 			String temp = requestType[0];
 			String[] splitString = temp.split(" ", 0);
