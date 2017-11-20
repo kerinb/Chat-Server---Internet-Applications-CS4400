@@ -33,13 +33,12 @@ public class ChatServer {
 		try{
 			initialiseServer(args[0]);
 			while(isServerRunning != false){
-//				if(isServerRunning == false){
-//					shutServerDown();
-//					break;
-//				}
+				if(isServerRunning == false || numLiveThreads.get() == 0){
+					shutServerDown();
+					break;
+				}
 				takeCareOfConnection();
 			}
-			shutServerDown();
 			
 		}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");
