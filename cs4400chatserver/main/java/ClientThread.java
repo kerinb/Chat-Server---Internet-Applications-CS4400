@@ -69,6 +69,9 @@
    			}finally{
    				ErrorAndPrintHandler.printString(String.format("Thread: %s finished...", this.getId()));
    				ChatServer.numLiveThreads.getAndDecrement();
+   				if(ChatServer.numLiveThreads.get() == 0){
+   					ChatServer.shutServerDown();
+   				}
    				ErrorAndPrintHandler.printString("Number of threads Left: " + ChatServer.numLiveThreads.get());
    			}
    	}
