@@ -154,26 +154,18 @@
    
    	private synchronized void killService(RequestTypeNode requestTypeNode) {
    		ErrorAndPrintHandler.printString(String.format("Client: %s requested to kill server", requestTypeNode.getName()));
-   		ChatServer.setRunningValue(false);
-   		try{
-   			sleep(100);
-   			//join();// wait for thread to die... 
-   		}catch(InterruptedException e){
-   			interrupt();
-   		}
-   		if(!ChatServer.getServerSocket().isClosed()){
-   			handleKillServiceError(requestTypeNode, ErrorMessages.KillService);
-   		}
+   		ChatServer.setRunningValue(false);   			
+   		interrupt();
    	}
-   
-   	private void handleKillServiceError(RequestTypeNode requestTypeNode, ErrorMessages killservice) {
-   		String errorMessageToPrint = ResponceFromServer.ERROR.getValue() + killservice.getValue();
-   		try{
-   			this.connectedClient.getPrintWriter().write(errorMessageToPrint);
-   			}catch(Exception e){
-   			ErrorAndPrintHandler.printError(e.getMessage(), "Couldnt communicate failed killserver error to client");
-   		}
-   	}
+//   
+//   	private void handleKillServiceError(RequestTypeNode requestTypeNode, ErrorMessages killservice) {
+//   		String errorMessageToPrint = ResponceFromServer.ERROR.getValue() + killservice.getValue();
+//   		try{
+//   			this.connectedClient.getPrintWriter().write(errorMessageToPrint);
+//   			}catch(Exception e){
+//   			ErrorAndPrintHandler.printError(e.getMessage(), "Couldnt communicate failed killserver error to client");
+//   		}
+//   	}
    	
    	private void helo(RequestTypeNode requestTypeNode){
    		try{
