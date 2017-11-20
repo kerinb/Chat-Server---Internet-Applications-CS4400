@@ -20,21 +20,16 @@ public class ChatRoom implements Comparable<ChatRoom>{
 	public String getChatRoomId(){return chatRoomId;}
 
 	public void addClientRecordToChatRoom(ConnectedClient connectedClient, RequestTypeNode requestTypeNode){
-		ErrorAndPrintHandler.printString(String.format("Adding Client: %s to chatRoom: %s",requestTypeNode.getName(), 
-				requestTypeNode.getChatRoomId()));
+		ErrorAndPrintHandler.printString(String.format("Adding Client: %s to chatRoom: %s",requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 		for(ConnectedClient connectedClient1 : listOfAllConnectedClients){
-			if(connectedClient1 == connectedClient){
-				return;
-			}
+			if(connectedClient1 == connectedClient){return;}
 		}
 		listOfAllConnectedClients.add(connectedClient);
-		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), 
-				requestTypeNode.getChatRoomId()));
+		ErrorAndPrintHandler.printString(String.format("Added Client: %s to chatRoom: %s",requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 	}
 	
 	public void removeClientRecord(ConnectedClient connectedClient2, RequestTypeNode requestTypeNode) throws Exception{
-		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), 
-				requestTypeNode.getChatRoomId()));
+		ErrorAndPrintHandler.printString(String.format("Removing Client: %s to chatRoom: %s",requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 		ErrorAndPrintHandler.printString(String.format("Client to remove: %s", connectedClient2.getId()));
 		for(ConnectedClient connectedClient : listOfAllConnectedClients){
 			ErrorAndPrintHandler.printString(String.format("Check client: %s", connectedClient.getId()));
@@ -49,11 +44,8 @@ public class ChatRoom implements Comparable<ChatRoom>{
 
 	@Override
 	public int compareTo(ChatRoom o) {
-		if(this.getChatRoomRef() < o.getChatRoomRef()){
-			return -1;
-		}else if(this.getChatRoomRef() > o.getChatRoomRef()){
-			return 1;
-		}
+		if(this.getChatRoomRef() < o.getChatRoomRef()){return -1;}
+		else if(this.getChatRoomRef() > o.getChatRoomRef()){return 1;}
 		return 0;
 	}
 	
@@ -70,6 +62,6 @@ public class ChatRoom implements Comparable<ChatRoom>{
 				}
 			}
 		}
-		System.out.println("Broadcasted messgae to chatroom");
+		ErrorAndPrintHandler.printString("Broadcasted messgae to chatroom");
 	}
 }

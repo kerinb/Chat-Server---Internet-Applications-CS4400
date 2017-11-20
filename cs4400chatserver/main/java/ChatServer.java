@@ -1,6 +1,7 @@
 package main.java;
 
 // GOT 102 MUTHA FUCKAASSS!
+// Now server shuts down 100% when all threads have died. 
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -33,19 +34,12 @@ public class ChatServer {
 		try{
 			initialiseServer(args[0]);
 			while(isServerRunning != false ){
-				if(isServerRunning == false && numLiveThreads.get() == 0){
-					shutServerDown();
-					break;
-				}
+				if(isServerRunning == false && numLiveThreads.get() == 0){shutServerDown();}
 				takeCareOfConnection();
 			}
-			
-		}catch(Exception e){
-			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");
-			e.printStackTrace();
-		}finally{
-			shutServerDown();
 		}
+		catch(Exception e){ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");}
+		finally{shutServerDown();}
 	}
 
 	private static void takeCareOfConnection() throws IOException {
@@ -97,32 +91,21 @@ public class ChatServer {
 			listOfAllActiveClients.clear();
 			serverSocket.close();
 			ErrorAndPrintHandler.printString("Shut down server");
-		}catch(Exception e){
-			ErrorAndPrintHandler.printError(e.getMessage(), "Error Occurred when shutting down server");
 		}
+		catch(Exception e){ErrorAndPrintHandler.printError(e.getMessage(), "Error Occurred when shutting down server");}
 	}
-	
 
-	 static void removeClientFromServer(RequestTypeNode requestTypeNode, ConnectedClient connectedClient) 
-			 throws Exception {
-		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving the chatroom: %s",requestTypeNode.getName(), 
-				requestTypeNode.getChatRoomId()));
+	 static void removeClientFromServer(RequestTypeNode requestTypeNode, ConnectedClient connectedClient) throws Exception {
+		ErrorAndPrintHandler.printString(String.format("Client: %s is leaving the chatroom: %s",requestTypeNode.getName(), requestTypeNode.getChatRoomId()));
 		if(getListOfAllConnectedClients().contains(connectedClient)){
 			for(ChatRoom chatRoom : getListOfAllActiveChatRooms()){
-				
 				if(chatRoom.getListOfAllConnectedClients().contains(connectedClient)){
-					
-					ErrorAndPrintHandler.printString(String.format("Removes Client: %s Fom chatroom: %s", 
-							connectedClient.getId(), chatRoom.getChatRoomId()));
-					
+					ErrorAndPrintHandler.printString(String.format("Removes Client: %s Fom chatroom: %s", connectedClient.getId(), chatRoom.getChatRoomId()));
 					String message = String.format("%s has left this chatroom", requestTypeNode.getName());
-					
-					String clientLeaveMessage = String.format(ResponceFromServer.CHAT.getValue(), 
-							chatRoom.getChatRoomRef(), requestTypeNode.getName(), message);
+					String clientLeaveMessage = String.format(ResponceFromServer.CHAT.getValue(), chatRoom.getChatRoomRef(), requestTypeNode.getName(), message);
 					chatRoom.broadcastMessageToEntireChatRoom(clientLeaveMessage);
 					chatRoom.removeClientRecord(connectedClient, requestTypeNode);
-					ErrorAndPrintHandler.printString(String.format("Broadcasted message to chatroom: %s",
-							chatRoom.getChatRoomId()));
+					ErrorAndPrintHandler.printString(String.format("Broadcasted message to chatroom: %s",chatRoom.getChatRoomId()));
 				}
 			}
 		}
@@ -130,8 +113,7 @@ public class ChatServer {
 	
 	static void addClientToServer(ConnectedClient connectedClient, RequestTypeNode requestTypeNode) {
 		ErrorAndPrintHandler.printString(String.format("Adding Client %s to server", requestTypeNode.getName()));
-		if((requestTypeNode.getRequestType().equals(RequestType.JOIN_CHATROOM)) && 
-				(!getListOfAllConnectedClients().contains(connectedClient)) 
+		if((requestTypeNode.getRequestType().equals(RequestType.JOIN_CHATROOM)) && (!getListOfAllConnectedClients().contains(connectedClient)) 
 				&& (getChatRoomByIdIfExist(requestTypeNode.getChatRoomId()) != null)){
 			for(ConnectedClient connectedClient1 : listOfAllActiveClients){
 				if(connectedClient1 == connectedClient){
@@ -147,9 +129,7 @@ public class ChatServer {
 	static synchronized ChatRoom getChatRoomByIdIfExist(String chatRoomId) {
 		for(ChatRoom chatRoom : listOfAllActiveChatRooms){
 			ErrorAndPrintHandler.printString("Room#: " + chatRoom.getChatRoomId());
-			if(chatRoom.getChatRoomId().equals(chatRoomId)){
-				return chatRoom;
-			}
+			if(chatRoom.getChatRoomId().equals(chatRoomId)){return chatRoom;}
 		}
 		return null;
 	}
@@ -166,6 +146,4 @@ public class ChatServer {
 		ErrorAndPrintHandler.printString("Chatroom not found");
 		return null;
 	}
-	
-	
 }
