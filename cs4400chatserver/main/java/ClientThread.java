@@ -156,10 +156,10 @@
    		ErrorAndPrintHandler.printString(String.format("Client: %s requested to kill server", requestTypeNode.getName()));
    		ChatServer.setRunningValue(false);
    		try{
-   			join();// wait for thread to die... 
+   			sleep(100);
+   			//join();// wait for thread to die... 
    		}catch(InterruptedException e){
-   			e.printStackTrace();
-   			ErrorAndPrintHandler.printError(e.getMessage(), "Issue with killing service");
+   			interrupt();
    		}
    		if(!ChatServer.getServerSocket().isClosed()){
    			handleKillServiceError(requestTypeNode, ErrorMessages.KillService);
