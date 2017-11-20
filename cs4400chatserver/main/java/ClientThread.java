@@ -155,6 +155,7 @@
    	private synchronized void killService(RequestTypeNode requestTypeNode) {
    		ErrorAndPrintHandler.printString(String.format("Client: %s requested to kill server", requestTypeNode.getName()));
    		ChatServer.setRunningValue(false);
+   		ErrorAndPrintHandler.printString("Serer running set to false! will shut down server");
    		try{
    			sleep(10000);
    			//join();// wait for thread to die... 

@@ -34,6 +34,7 @@ public class ChatServer {
 			while(true){
 				if(isServerRunning == false){
 					shutServerDown();
+					break;
 				}
 				takeCareOfConnection();
 			}
