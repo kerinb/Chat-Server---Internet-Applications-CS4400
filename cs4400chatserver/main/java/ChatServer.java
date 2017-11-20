@@ -82,7 +82,7 @@ public class ChatServer {
 		isServerRunning = true;
 	}
 
-	private static void shutServerDown() {
+	public static void shutServerDown() {
 		try{
 			ErrorAndPrintHandler.printString("Shutting down server");
 			for(ConnectedClient connectedClient : getListOfAllConnectedClients()){
