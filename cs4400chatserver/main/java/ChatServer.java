@@ -33,7 +33,7 @@ public class ChatServer {
 		try{
 			initialiseServer(args[0]);
 			while(isServerRunning != false){
-				if(isServerRunning == false || numLiveThreads.get() == 0){
+				if(isServerRunning == false && numLiveThreads.get() == 0){
 					shutServerDown();
 					break;
 				}
