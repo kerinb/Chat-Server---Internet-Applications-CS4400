@@ -21,15 +21,14 @@
    
    	ConnectedClient connectedClient;
    	private int joinId;
-   	private int numThreads = 0; 
    	private boolean connected;
    	
    	public ClientThread(Socket socket){
    		try{
    			ErrorAndPrintHandler.printString("Creating a new thread....");
-   			numThreads ++;
    			this.joinId = ChatServer.nextClientId.getAndIncrement();
    			this.connected = true;
+   			ChatServer.numLiveThreads.getAndIncrement();
    			this.connectedClient = new ConnectedClient(joinId, socket, new BufferedInputStream(socket.getInputStream()),
    					new PrintWriter(socket.getOutputStream()));
    		}catch(IOException e){
@@ -69,10 +68,8 @@
    				e.getStackTrace();
    			}finally{
    				ErrorAndPrintHandler.printString(String.format("Thread: %s finished...", this.getId()));
-   				numThreads--;
-   				if(numThreads==0){
-   					ChatServer.shutServerDown();
-   				}
+   				ChatServer.numLiveThreads.getAndDecrement();
+   				ErrorAndPrintHandler.printString("Number of threads Left: " + ChatServer.numLiveThreads.get());
    			}
    	}
    

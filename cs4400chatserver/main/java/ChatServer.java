@@ -19,6 +19,7 @@ public class ChatServer {
 	public static AtomicInteger nextChatRoomId;
 	static int serverPort;
 	static String serverIP;
+	static AtomicInteger numLiveThreads;
 	
 	public static int getServerPort(){return serverPort;}
 	public static String getServerIp(){return serverIP;}
@@ -31,13 +32,15 @@ public class ChatServer {
 	public static void main(String[] args){
 		try{
 			initialiseServer(args[0]);
-			while(true){
-				if(isServerRunning == false){
-					shutServerDown();
-					break;
-				}
+			while(isServerRunning != false){
+//				if(isServerRunning == false){
+//					shutServerDown();
+//					break;
+//				}
 				takeCareOfConnection();
 			}
+			shutServerDown();
+			
 		}catch(Exception e){
 			ErrorAndPrintHandler.printError(e.getMessage(), "Occurred when taking in new client");
 			e.printStackTrace();
@@ -77,6 +80,7 @@ public class ChatServer {
 		ErrorAndPrintHandler.printString("Initialising server variables");
 		nextClientId = new AtomicInteger(0);
 		nextChatRoomId = new AtomicInteger(0);
+		numLiveThreads = new AtomicInteger(0);
 		listOfAllActiveClients = new ArrayList<ConnectedClient>();
 		listOfAllActiveChatRooms = new ArrayList<ChatRoom>();
 		isServerRunning = true;
